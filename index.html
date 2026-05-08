@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f1ec;
+  --surface:#faf9f7;
+  --surface2:#f0ede7;
+  --border:rgba(60,50,35,0.1);
+  --border2:rgba(60,50,35,0.16);
+  --text:#1c1a16;
+  --text2:#6a6355;
+  --text3:#a09890;
+  --accent:#c4533a;
+  --accent-bg:#f9ece8;
+  --think-bg:#f5f2eb;
+  --think-border:#ddd8ce;
+  --think-text:#7a7060;
+  --user-bg:#1c1a16;
+  --user-text:#f4f1ec;
+  --r:18px;
+  --r-sm:10px;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+}
+
+/* ── TOP BAR ── */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 24px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  gap:12px;
+}
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:'Instrument Serif',serif;
+  font-size:20px;
+  color:var(--text);
+  text-decoration:none;
+}
+.logo-star{
+  width:28px;height:28px;
+  color:var(--accent);
+}
+.logo-star svg{width:100%;height:100%}
+.model-pill{
+  font-size:12px;
+  font-weight:400;
+  color:var(--text3);
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:100px;
+  padding:4px 12px;
+  letter-spacing:0.02em;
+}
+.api-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.api-input{
+  font-family:'DM Sans',sans-serif;
+  font-size:13px;
+  padding:6px 12px;
+  border-radius:100px;
+  border:1px solid var(--border2);
+  background:var(--bg);
+  color:var(--text);
+  outline:none;
+  width:240px;
+  transition:border-color .2s;
+}
+.api-input:focus{border-color:var(--accent)}
+.api-input::placeholder{color:var(--text3)}
+.api-save{
+  font-family:'DM Sans',sans-serif;
+  font-size:12px;
+  padding:6px 14px;
+  border-radius:100px;
+  border:none;
+  background:var(--accent);
+  color:#fff;
+  cursor:pointer;
+  transition:opacity .15s;
+}
+.api-save:hover{opacity:.85}
+
+/* ── CHAT AREA ── */
+.chat-wrap{
+  flex:1;
+  overflow-y:auto;
+  padding:32px 0 16px;
+  scroll-behavior:smooth;
+}
+.chat-inner{
+  max-width:720px;
+  margin:0 auto;
+  padding:0 24px;
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+
+/* empty state */
+.empty{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:50vh;
+  gap:16px;
+  text-align:center;
+  animation:fadeIn .6s ease;
+}
+.empty-star{width:48px;height:48px;color:var(--accent);opacity:.6}
+.empty-star svg{width:100%;height:100%}
+.empty h1{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(28px,4vw,42px);
+  font-weight:400;
+  color:var(--text);
+  line-height:1.2;
+}
+.empty p{font-size:15px;color:var(--text2);max-width:400px;line-height:1.6}
+
+/* messages */
+.msg{display:flex;flex-direction:column;gap:8px;animation:slideUp .3s ease}
+.msg-user{align-items:flex-end}
+.msg-assistant{align-items:flex-start}
+
+.bubble{
+  padding:14px 18px;
+  border-radius:var(--r);
+  line-height:1.65;
+  font-size:15px;
+  max-width:85%;
+}
+.bubble-user{
+  background:var(--user-bg);
+  color:var(--user-text);
+  border-bottom-right-radius:5px;
+}
+.bubble-assistant{
+  background:var(--surface);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-bottom-left-radius:5px;
+}
+
+/* thinking block */
+.think-wrap{
+  max-width:85%;
+  border:1px solid var(--think-border);
+  border-radius:var(--r);
+  border-bottom-left-radius:5px;
+  overflow:hidden;
+  background:var(--think-bg);
+}
+.think-header{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  cursor:pointer;
+  user-select:none;
+  border-bottom:1px solid var(--think-border);
+}
+.think-header:hover{background:rgba(0,0,0,0.03)}
+.think-dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--accent);
+  flex-shrink:0;
+}
+.think-dot.pulsing{
+  animation:pulse 1.2s ease-in-out infinite;
+}
+.think-label{
+  font-size:12px;
+  font-weight:500;
+  color:var(--think-text);
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  flex:1;
+}
+.think-chevron{
+  font-size:13px;
+  color:var(--think-text);
+  transition:transform .2s;
+}
+.think-chevron.open{transform:rotate(180deg)}
+.think-body{
+  padding:12px 14px;
+  font-family:'DM Mono',monospace,'DM Sans',sans-serif;
+  font-size:12.5px;
+  color:var(--think-text);
+  line-height:1.7;
+  white-space:pre-wrap;
+  word-break:break-word;
+  display:none;
+}
+.think-body.visible{display:block}
+
+/* streaming cursor */
+.cursor{
+  display:inline-block;
+  width:2px;height:1em;
+  background:var(--accent);
+  vertical-align:text-bottom;
+  animation:blink .7s step-end infinite;
+  margin-left:2px;
+}
+
+/* ── INPUT ── */
+.input-wrap{
+  flex-shrink:0;
+  padding:16px 24px 24px;
+  background:var(--bg);
+}
+.input-box{
+  max-width:720px;
+  margin:0 auto;
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:var(--r);
+  padding:14px 16px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06);
+  transition:border-color .2s,box-shadow .2s;
+}
+.input-box:focus-within{
+  border-color:rgba(196,83,58,0.35);
+  box-shadow:0 2px 18px rgba(196,83,58,0.08);
+}
+textarea{
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  color:var(--text);
+  background:transparent;
+  border:none;
+  outline:none;
+  resize:none;
+  min-height:24px;
+  max-height:180px;
+  line-height:1.6;
+  overflow-y:auto;
+}
+textarea::placeholder{color:var(--text3)}
+.input-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.input-hint{font-size:12px;color:var(--text3)}
+.send-btn{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-family:'DM Sans',sans-serif;
+  font-size:13px;
+  font-weight:500;
+  padding:8px 18px;
+  border-radius:100px;
+  border:none;
+  background:var(--accent);
+  color:#fff;
+  cursor:pointer;
+  transition:opacity .15s,transform .1s;
+}
+.send-btn:hover{opacity:.88}
+.send-btn:active{transform:scale(.97)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.send-btn svg{width:14px;height:14px}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── MARKDOWN ── */
+.bubble-assistant p{margin:0 0 8px}
+.bubble-assistant p:last-child{margin:0}
+.bubble-assistant h1,.bubble-assistant h2,.bubble-assistant h3{
+  font-family:'Instrument Serif',serif;
+  font-weight:400;
+  margin:12px 0 6px;
+  line-height:1.3;
+}
+.bubble-assistant h1{font-size:22px}
+.bubble-assistant h2{font-size:19px}
+.bubble-assistant h3{font-size:16px}
+.bubble-assistant ul,.bubble-assistant ol{padding-left:20px;margin:6px 0}
+.bubble-assistant li{margin:3px 0}
+.bubble-assistant code{
+  font-family:'DM Mono',monospace;
+  font-size:12.5px;
+  background:var(--surface2);
+  padding:2px 6px;
+  border-radius:5px;
+}
+.bubble-assistant pre{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px;
+  overflow-x:auto;
+  margin:10px 0;
+}
+.bubble-assistant pre code{
+  background:none;
+  padding:0;
+  font-size:12.5px;
+  line-height:1.6;
+}
+.bubble-assistant strong{font-weight:500}
+.bubble-assistant em{font-style:italic}
+.bubble-assistant blockquote{
+  border-left:3px solid var(--accent);
+  padding-left:12px;
+  color:var(--text2);
+  margin:8px 0;
+}
+.bubble-assistant a{color:var(--accent);text-decoration:underline}
+.bubble-assistant hr{border:none;border-top:1px solid var(--border);margin:12px 0}
+.bubble-assistant table{border-collapse:collapse;width:100%;margin:8px 0;font-size:14px}
+.bubble-assistant th,.bubble-assistant td{border:1px solid var(--border2);padding:7px 12px;text-align:left}
+.bubble-assistant th{background:var(--surface2);font-weight:500}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a class="logo" href="#">
+    <span class="logo-star"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/></svg></span>
+    Claude
+  </a>
+  <span class="model-pill">claude-sonnet-4-5</span>
+  <div class="api-row">
+    <input class="api-input" id="apiKey" type="password" placeholder="Paste your Anthropic API key…">
+    <button class="api-save" onclick="saveKey()">Save</button>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="chat-wrap" id="chatWrap">
+  <div class="chat-inner" id="chatInner">
+    <div class="empty" id="emptyState">
+      <div class="empty-star"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/></svg></div>
+      <h1>Good evening</h1>
+      <p>Ask me anything. I'll show you my reasoning in real-time when I'm thinking through something complex.</p>
+    </div>
+  </div>
+</div>
+
+<!-- INPUT -->
+<div class="input-wrap">
+  <div class="input-box">
+    <textarea id="userInput" placeholder="Message Claude…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <div class="input-footer">
+      <span class="input-hint">Enter to send · Shift+Enter for newline</span>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SYSTEM PROMPT ─────────────────────────────────────────────────────────────
+const SYSTEM = `You are an exceptionally capable AI assistant. Your goal is to provide the most accurate, insightful, and genuinely helpful responses possible.
+
+THINKING & REASONING:
+- Before answering complex questions, think step-by-step in your extended thinking
+- Use your thinking space to explore multiple angles, check your work, and catch errors
+- Don't rush to conclusions — deliberate thinking produces better answers
+- For math, logic, or multi-step problems, show your reasoning clearly
+
+RESPONSE QUALITY:
+- Be direct and precise. Cut filler words, hedging, and unnecessary caveats
+- Use concrete examples over abstract explanations whenever possible
+- Match your depth to the question: brief for simple queries, thorough for complex ones
+- When you're uncertain, say so clearly rather than hedging vaguely
+- Structure long responses with clear sections, but don't over-format short ones
+
+PERSONALITY:
+- Be warm but not sycophantic — never open with "Great question!" or similar
+- Have opinions and defend them when asked, while remaining genuinely open to counterarguments
+- Use natural, conversational language — avoid corporate or robotic phrasing
+- Show intellectual curiosity and genuine engagement with interesting problems
+
+HONESTY:
+- Never make up facts, citations, or statistics
+- If you don't know something, say so and explain what you do know
+- Challenge incorrect premises respectfully but clearly
+- Acknowledge the limits of your knowledge and training cutoff when relevant
+
+CAPABILITIES:
+- Code: write clean, well-commented, production-ready code by default
+- Math: work through problems carefully, showing steps
+- Writing: adapt tone and style to what the user actually needs
+- Analysis: go beyond surface-level — find the non-obvious angle
+
+You have extended thinking enabled. Use it genuinely — it's your scratchpad for working through hard problems before giving your final answer.`;
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let history = [];
+let isStreaming = false;
+let savedKey = localStorage.getItem('anthropic_key') || '';
+if (savedKey) document.getElementById('apiKey').value = savedKey;
+
+function saveKey(){
+  const k = document.getElementById('apiKey').value.trim();
+  if(!k){alert('Please enter your API key.');return;}
+  localStorage.setItem('anthropic_key', k);
+  savedKey = k;
+  const btn = document.querySelector('.api-save');
+  btn.textContent = 'Saved ✓';
+  setTimeout(()=>btn.textContent='Save', 1500);
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function autoResize(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,180)+'px';
+}
+function handleKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}
+}
+function scrollBottom(){
+  const w=document.getElementById('chatWrap');
+  w.scrollTop=w.scrollHeight;
+}
+function getKey(){
+  return document.getElementById('apiKey').value.trim() || savedKey;
+}
+
+// ── SIMPLE MARKDOWN ───────────────────────────────────────────────────────────
+function md(text){
+  let h = text
+    // code blocks
+    .replace(/```(\w*)\n?([\s\S]*?)```/g,'<pre><code>$2</code></pre>')
+    // inline code
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    // headings
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+    // bold/italic
+    .replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    // blockquotes
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    // hr
+    .replace(/^---$/gm,'<hr>')
+    // unordered list
+    .replace(/^\* (.+)$/gm,'<li>$1</li>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    // ordered list
+    .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
+    // line breaks
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/\n/g,'<br>');
+  // wrap loose <li> in <ul>
+  h = h.replace(/((<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>');
+  // wrap in paragraphs if not already block
+  if(!h.match(/^<(h[1-3]|ul|ol|pre|blockquote|hr)/)){
+    h = '<p>'+h+'</p>';
+  }
+  return h;
+}
+
+// ── APPEND MESSAGE ────────────────────────────────────────────────────────────
+function appendUserMsg(text){
+  document.getElementById('emptyState')?.remove();
+  const wrap = document.getElementById('chatInner');
+  const div = document.createElement('div');
+  div.className='msg msg-user';
+  div.innerHTML=`<div class="bubble bubble-user">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div>`;
+  wrap.appendChild(div);
+  scrollBottom();
+}
+
+function createAssistantMsg(){
+  document.getElementById('emptyState')?.remove();
+  const wrap = document.getElementById('chatInner');
+  const div = document.createElement('div');
+  div.className='msg msg-assistant';
+  div.id='streaming-msg';
+  wrap.appendChild(div);
+  return div;
+}
+
+// ── SEND ──────────────────────────────────────────────────────────────────────
+async function sendMessage(){
+  if(isStreaming) return;
+  const key = getKey();
+  if(!key){
+    alert('Please paste your Anthropic API key in the field above and click Save.');
+    return;
+  }
+  const ta = document.getElementById('userInput');
+  const text = ta.value.trim();
+  if(!text) return;
+
+  ta.value='';
+  ta.style.height='auto';
+  isStreaming=true;
+  document.getElementById('sendBtn').disabled=true;
+
+  appendUserMsg(text);
+  history.push({role:'user',content:text});
+
+  const msgDiv = createAssistantMsg();
+
+  // Create thinking block (hidden initially)
+  const thinkWrap = document.createElement('div');
+  thinkWrap.className='think-wrap';
+  thinkWrap.style.display='none';
+  thinkWrap.innerHTML=`
+    <div class="think-header" onclick="toggleThink(this)">
+      <span class="think-dot pulsing"></span>
+      <span class="think-label">Thinking…</span>
+      <span class="think-chevron open">▾</span>
+    </div>
+    <div class="think-body visible" id="thinkBody"></div>`;
+  msgDiv.appendChild(thinkWrap);
+
+  // Create response bubble
+  const bubble = document.createElement('div');
+  bubble.className='bubble bubble-assistant';
+  bubble.innerHTML='<span class="cursor"></span>';
+  msgDiv.appendChild(bubble);
+
+  scrollBottom();
+
+  let thinkingText='';
+  let responseText='';
+  let inThinking=false;
+  let inText=false;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-beta':'interleaved-thinking-2025-05-14'
+      },
+      body: JSON.stringify({
+        model:'claude-sonnet-4-5',
+        max_tokens:16000,
+        thinking:{type:'enabled', budget_tokens:10000},
+        system: SYSTEM,
+        messages: history,
+        stream: true
+      })
+    });
+
+    if(!res.ok){
+      const err = await res.json();
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf='';
+
+    while(true){
+      const {done,value} = await reader.read();
+      if(done) break;
+      buf += dec.decode(value,{stream:true});
+      const lines = buf.split('\n');
+      buf = lines.pop();
+
+      for(const line of lines){
+        if(!line.startsWith('data:')) continue;
+        const data = line.slice(5).trim();
+        if(data==='[DONE]') continue;
+        let evt;
+        try{ evt=JSON.parse(data); }catch{ continue; }
+
+        // content block start
+        if(evt.type==='content_block_start'){
+          if(evt.content_block?.type==='thinking'){
+            inThinking=true; inText=false;
+            thinkWrap.style.display='block';
+          } else if(evt.content_block?.type==='text'){
+            inThinking=false; inText=true;
+            // stop pulsing dot
+            thinkWrap.querySelector('.think-dot')?.classList.remove('pulsing');
+            const lbl=thinkWrap.querySelector('.think-label');
+            if(lbl) lbl.textContent='Reasoning';
+          }
+        }
+
+        // delta
+        if(evt.type==='content_block_delta'){
+          if(evt.delta?.type==='thinking_delta' && inThinking){
+            thinkingText += evt.delta.thinking||'';
+            const tb=document.getElementById('thinkBody');
+            if(tb) tb.textContent=thinkingText;
+            scrollBottom();
+          }
+          if(evt.delta?.type==='text_delta' && inText){
+            responseText += evt.delta.text||'';
+            bubble.innerHTML = md(responseText)+'<span class="cursor"></span>';
+            scrollBottom();
+          }
+        }
+      }
+    }
+
+    // Finalise
+    bubble.innerHTML = md(responseText);
+    if(!thinkingText) thinkWrap.remove();
+
+    history.push({role:'assistant', content: responseText});
+
+  } catch(e){
+    bubble.innerHTML=`<span style="color:#c0392b;font-size:14px;">⚠ Error: ${e.message}</span>`;
+    if(!thinkingText) thinkWrap.remove();
+  }
+
+  isStreaming=false;
+  document.getElementById('sendBtn').disabled=false;
+  document.getElementById('streaming-msg')?.removeAttribute('id');
+}
+
+function toggleThink(header){
+  const body=header.parentElement.querySelector('.think-body');
+  const chev=header.querySelector('.think-chevron');
+  if(!body) return;
+  const open=body.classList.toggle('visible');
+  chev.classList.toggle('open',open);
+}
+</script>
+</body>
+</html>
