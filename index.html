@@ -166,6 +166,37 @@ textarea::placeholder{color:var(--text3)}
 .credit-bar-fill.warn{background:#e0a020}
 .credit-bar-fill.low{background:#c0392b}
 
+/* ── PASTE ATTACHMENT ─────────────────────────────────────────────────────── */
+.paste-attach{display:flex;align-items:center;gap:8px;padding:7px 11px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;font-size:12px;color:var(--text2);position:relative;max-width:220px;cursor:default}
+.paste-attach-icon{font-size:16px;flex-shrink:0;line-height:1}
+.paste-attach-info{flex:1;min-width:0}
+.paste-attach-name{font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+.paste-attach-size{font-size:10px;color:var(--text3)}
+.paste-attach-remove{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--text2);color:#fff;border:none;cursor:pointer;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.paste-attach-remove:hover{background:var(--accent)}
+
+/* User bubble text attachment display */
+.user-text-attach{display:flex;align-items:center;gap:7px;padding:8px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;font-size:12px;color:var(--user-text);max-width:260px;margin-bottom:6px}
+.user-text-attach-icon{font-size:15px;opacity:.7}
+.user-text-attach-info{flex:1;min-width:0}
+.user-text-attach-name{font-weight:500;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-text-attach-size{font-size:10px;opacity:.6}
+
+/* Stop button */
+.send-btn.stop-mode{background:var(--text);gap:6px}
+.send-btn.stop-mode:hover{opacity:.8}
+
+/* ── CODE BLOCKS ──────────────────────────────────────────────────────────── */
+.bubble-assistant .code-block-wrap{margin:10px 0;border-radius:10px;overflow:hidden;border:1px solid var(--border2)}
+.bubble-assistant .code-block-header{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.bubble-assistant .code-lang{font-size:11px;font-weight:500;color:var(--text2);text-transform:lowercase;font-family:monospace}
+.bubble-assistant .copy-btn{display:flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;padding:3px 9px;border-radius:6px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;transition:background .15s,color .15s,border-color .15s;flex-shrink:0}
+.bubble-assistant .copy-btn:hover{background:var(--bg);color:var(--text);border-color:var(--border2)}
+.bubble-assistant .copy-btn.copied{background:rgba(196,83,58,0.1);color:var(--accent);border-color:rgba(196,83,58,0.25)}
+.bubble-assistant .copy-btn svg{width:12px;height:12px}
+.bubble-assistant .code-block-wrap pre{margin:0;border-radius:0;border:none;background:var(--surface2)}
+.bubble-assistant .code-block-wrap pre code{background:none;padding:0}
+
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
@@ -307,9 +338,9 @@ textarea::placeholder{color:var(--text3)}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         </button>
         <span class="input-hint" id="inputHint">Enter to send · Shift+Enter for newline</span>
-        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Send
+        <button class="send-btn" id="sendBtn" onclick="handleSendStop()">
+          <svg id="sendIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span id="sendLabel">Send</span>
         </button>
       </div>
     </div>
@@ -680,33 +711,111 @@ function renderChat() {
 }
 
 // ── IMAGE HANDLING ─────────────────────────────────────────────────────────
-function handleFileSelect(e) { Array.from(e.target.files).forEach(loadImageFile); e.target.value=''; }
+// Pending state: images and text attachments
+let pendingTextAttachments = []; // {name, content}
+const LARGE_TEXT_THRESHOLD = 300; // chars — paste as attachment above this
+
+function handleFileSelect(e) { Array.from(e.target.files).forEach(f => { if(f.type.startsWith('image/')) loadImageFile(f); }); e.target.value=''; }
 
 function loadImageFile(file) {
   if (!file || !file.type.startsWith('image/')) return;
   const reader = new FileReader();
   reader.onload = ev => {
     const dataUrl = ev.target.result;
-    pendingImages.push({ dataUrl, base64: dataUrl.split(',')[1], mediaType: file.type, name: file.name });
-    renderPreviews();
+    // Normalize all images to JPEG via canvas to avoid format issues (some browsers
+    // report wrong MIME types, or the API rejects certain PNG sub-formats)
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      // Fill white background in case of transparency (JPEG doesn't support alpha)
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      // Use PNG to preserve quality and avoid JPEG artifacts — PNG is always safe
+      const normalizedDataUrl = canvas.toDataURL('image/png');
+      pendingImages.push({
+        dataUrl: normalizedDataUrl,
+        base64: normalizedDataUrl.split(',')[1],
+        mediaType: 'image/png',
+        name: file.name
+      });
+      renderPreviews();
+    };
+    img.onerror = () => {
+      // Fallback: use original data as-is
+      pendingImages.push({ dataUrl, base64: dataUrl.split(',')[1], mediaType: file.type, name: file.name });
+      renderPreviews();
+    };
+    img.src = dataUrl;
   };
   reader.readAsDataURL(file);
 }
 
+function addTextAttachment(text, name) {
+  pendingTextAttachments.push({ name: name || 'pasted-text.txt', content: text });
+  renderPreviews();
+}
+
 function renderPreviews() {
-  document.getElementById('imgPreviewStrip').innerHTML = pendingImages.map((img,i) =>
-    `<div class="img-thumb"><img src="${img.dataUrl}" alt=""><button class="img-thumb-remove" onclick="removeImage(${i})">✕</button></div>`
-  ).join('');
+  const strip = document.getElementById('imgPreviewStrip');
+  let html = '';
+  // Text attachments
+  pendingTextAttachments.forEach((att, i) => {
+    const lines = att.content.split('\n').length;
+    const chars = att.content.length;
+    html += `<div class="paste-attach">
+      <span class="paste-attach-icon">📄</span>
+      <div class="paste-attach-info">
+        <div class="paste-attach-name">${escHtml(att.name)}</div>
+        <div class="paste-attach-size">${lines} lines · ${chars} chars</div>
+      </div>
+      <button class="paste-attach-remove" onclick="removeTextAttach(${i})">✕</button>
+    </div>`;
+  });
+  // Image attachments
+  pendingImages.forEach((img, i) => {
+    html += `<div class="img-thumb"><img src="${img.dataUrl}" alt=""><button class="img-thumb-remove" onclick="removeImage(${i})">✕</button></div>`;
+  });
+  strip.innerHTML = html;
 }
 
 function removeImage(i) { pendingImages.splice(i,1); renderPreviews(); }
+function removeTextAttach(i) { pendingTextAttachments.splice(i,1); renderPreviews(); }
 
 const inputWrap = document.getElementById('inputWrap');
 inputWrap.addEventListener('dragover', e => { e.preventDefault(); inputWrap.classList.add('drag-over'); });
 inputWrap.addEventListener('dragleave', () => inputWrap.classList.remove('drag-over'));
-inputWrap.addEventListener('drop', e => { e.preventDefault(); inputWrap.classList.remove('drag-over'); Array.from(e.dataTransfer.files).forEach(loadImageFile); });
+inputWrap.addEventListener('drop', e => {
+  e.preventDefault(); inputWrap.classList.remove('drag-over');
+  Array.from(e.dataTransfer.files).forEach(f => {
+    if (f.type.startsWith('image/')) loadImageFile(f);
+    else if (f.type.startsWith('text/') || f.name.match(/\.(txt|md|js|ts|py|html|css|json|csv|xml|yaml|yml|sh|rb|go|rs|java|c|cpp|h)$/i)) {
+      const reader = new FileReader();
+      reader.onload = ev => addTextAttachment(ev.target.result, f.name);
+      reader.readAsText(f);
+    }
+  });
+});
+
 document.addEventListener('paste', e => {
-  Array.from(e.clipboardData?.items||[]).forEach(item => { if(item.type.startsWith('image/')){ const f=item.getAsFile(); if(f) loadImageFile(f); } });
+  const items = Array.from(e.clipboardData?.items || []);
+  // Check for image items first
+  const imgItem = items.find(it => it.type.startsWith('image/'));
+  if (imgItem) { const f = imgItem.getAsFile(); if(f) loadImageFile(f); return; }
+  // Check for large text paste — attach instead of dumping into textarea
+  const textItem = items.find(it => it.type === 'text/plain');
+  if (textItem) {
+    textItem.getAsString(str => {
+      if (str.length >= LARGE_TEXT_THRESHOLD) {
+        e.preventDefault();
+        addTextAttachment(str, 'pasted-text.txt');
+      }
+      // Short text: let it paste normally into textarea
+    });
+  }
 });
 
 // ── HELPERS ────────────────────────────────────────────────────────────────
@@ -715,10 +824,62 @@ function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.sc
 function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } }
 function scrollBottom() { const w=document.getElementById('chatWrap'); w.scrollTop=w.scrollHeight; }
 
+// ── COPY CODE ──────────────────────────────────────────────────────────────
+window.copyCode = function(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  // Get the raw text content (not innerHTML) so we get the unescaped code
+  const text = el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    // Find the button that triggered this copy and show feedback
+    const btn = el.closest('.code-block-wrap')?.querySelector('.copy-btn');
+    if (btn) {
+      btn.classList.add('copied');
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Copied!`;
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy`;
+      }, 2000);
+    }
+  }).catch(() => {
+    // Fallback for older browsers
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('copy');
+    sel.removeAllRanges();
+  });
+};
+
+// ── MARKDOWN RENDERER ──────────────────────────────────────────────────────
+// Tracks code block IDs to ensure uniqueness per render call
+let _codeBlockIdx = 0;
+
 function md(text) {
-  let h = text
-    .replace(/```(\w*)\n?([\s\S]*?)```/g,'<pre><code>$2</code></pre>')
-    .replace(/`([^`]+)`/g,'<code>$1</code>')
+  let codeIdx = 0;
+  const blockId = ++_codeBlockIdx;
+
+  // 1. Fenced code blocks — MUST escape HTML inside the code, then wrap with copy button
+  //    Use a placeholder approach to protect already-processed blocks from further regex
+  const codeBlocks = [];
+  let h = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const escaped = escHtml(code.trimEnd());
+    const id = `code_${blockId}_${++codeIdx}`;
+    const langLabel = lang ? `<span class="code-lang">${escHtml(lang)}</span>` : '<span class="code-lang"></span>';
+    const copyIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+    const html = `<div class="code-block-wrap"><div class="code-block-header">${langLabel}<button class="copy-btn" onclick="copyCode('${id}')">${copyIcon}Copy</button></div><pre><code id="${id}">${escaped}</code></pre></div>`;
+    const placeholder = `\x00CODEBLOCK${codeBlocks.length}\x00`;
+    codeBlocks.push(html);
+    return placeholder;
+  });
+
+  // 2. Inline code — escape HTML inside backticks
+  h = h.replace(/`([^`\n]+)`/g, (_, code) => `<code>${escHtml(code)}</code>`);
+
+  // 3. Standard markdown transformations
+  h = h
     .replace(/^### (.+)$/gm,'<h3>$1</h3>')
     .replace(/^## (.+)$/gm,'<h2>$1</h2>')
     .replace(/^# (.+)$/gm,'<h1>$1</h1>')
@@ -731,9 +892,46 @@ function md(text) {
     .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
     .replace(/\n\n/g,'</p><p>')
     .replace(/\n/g,'<br>');
+
+  // 4. Wrap list items
   h = h.replace(/((<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>');
-  if (!h.match(/^<(h[1-3]|ul|ol|pre|blockquote|hr)/)) h='<p>'+h+'</p>';
+
+  // 5. Wrap in paragraph if not a block element
+  if (!h.match(/^<(h[1-3]|ul|ol|pre|blockquote|hr|\x00)/)) h = '<p>' + h + '</p>';
+
+  // 6. Restore code block placeholders
+  h = h.replace(/\x00CODEBLOCK(\d+)\x00/g, (_, i) => codeBlocks[parseInt(i)]);
+
   return h;
+}
+
+// ── STOP / SEND TOGGLE ────────────────────────────────────────────────────
+let abortController = null;
+
+function setStreamingUI(streaming) {
+  const btn   = document.getElementById('sendBtn');
+  const icon  = document.getElementById('sendIcon');
+  const label = document.getElementById('sendLabel');
+  if (streaming) {
+    btn.classList.add('stop-mode');
+    btn.disabled = false;
+    icon.innerHTML = '<rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor" stroke="none"/>';
+    label.textContent = 'Stop';
+  } else {
+    btn.classList.remove('stop-mode');
+    btn.disabled = false;
+    icon.innerHTML = '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>';
+    label.textContent = 'Send';
+  }
+}
+
+function handleSendStop() {
+  if (isStreaming) {
+    // Abort the stream
+    abortController?.abort();
+  } else {
+    sendMessage();
+  }
 }
 
 // ── SEND ──────────────────────────────────────────────────────────────────
@@ -751,12 +949,13 @@ async function sendMessage() {
   const ta   = document.getElementById('userInput');
   const text = ta.value.trim();
   const imgs = [...pendingImages];
-  if (!text && imgs.length === 0) return;
+  const textAttachments = [...pendingTextAttachments];
+  if (!text && imgs.length === 0 && textAttachments.length === 0) return;
 
   ta.value=''; ta.style.height='auto';
-  pendingImages=[]; renderPreviews();
+  pendingImages=[]; pendingTextAttachments=[]; renderPreviews();
   isStreaming=true;
-  document.getElementById('sendBtn').disabled=true;
+  setStreamingUI(true);
 
   const conv = conversations[activeChatId];
   const cfg  = THINK_CONFIG[thinkMode];
@@ -768,19 +967,35 @@ async function sendMessage() {
   const uDiv = document.createElement('div');
   uDiv.className = 'msg msg-user';
   let uHtml = '';
+  // Show text attachments as cards in the user bubble
+  textAttachments.forEach(att => {
+    const lines = att.content.split('\n').length;
+    uHtml += `<div class="user-text-attach">
+      <span class="user-text-attach-icon">📄</span>
+      <div class="user-text-attach-info">
+        <div class="user-text-attach-name">${escHtml(att.name)}</div>
+        <div class="user-text-attach-size">${lines} lines · ${att.content.length} chars</div>
+      </div>
+    </div>`;
+  });
   if (imgs.length) uHtml += `<div class="user-images">${imgs.map(i=>`<img class="user-img-thumb" src="${i.dataUrl}" alt="">`).join('')}</div>`;
   if (text) uHtml += `<div class="bubble bubble-user">${escHtml(text).replace(/\n/g,'<br>')}</div>`;
   uDiv.innerHTML = uHtml;
   wrap.appendChild(uDiv);
   scrollBottom();
 
+  // Build API content
   const userContent = [];
   imgs.forEach(img => userContent.push({ type:'image', source:{ type:'base64', media_type:img.mediaType, data:img.base64 } }));
+  // Include text attachments as text blocks with labels
+  textAttachments.forEach(att => {
+    userContent.push({ type:'text', text: `[Attached file: ${att.name}]\n\`\`\`\n${att.content}\n\`\`\`` });
+  });
   if (text) userContent.push({ type:'text', text });
   conv.history.push({ role:'user', content: userContent });
 
   if (conv.history.length === 1) {
-    const t = text || (imgs.length ? 'Image' : 'New conversation');
+    const t = text || (textAttachments[0]?.name) || (imgs.length ? 'Image' : 'New conversation');
     conv.title = t.length > 36 ? t.slice(0,36)+'…' : t;
     document.getElementById('topbarTitle').textContent = conv.title;
     renderSidebar();
@@ -815,6 +1030,7 @@ async function sendMessage() {
   scrollBottom();
 
   let thinkingText='', responseText='', inThinking=false, inText=false;
+  let stopped = false;
 
   try {
     const reqBody = {
@@ -826,7 +1042,8 @@ async function sendMessage() {
     const headers = { 'Content-Type':'application/json', 'anthropic-version':'2023-06-01' };
     if (cfg.enabled) headers['anthropic-beta'] = 'interleaved-thinking-2025-05-14';
 
-    const res = await fetch(PROXY_URL, { method:'POST', headers, body:JSON.stringify(reqBody) });
+    abortController = new AbortController();
+    const res = await fetch(PROXY_URL, { method:'POST', headers, body:JSON.stringify(reqBody), signal: abortController.signal });
     if (!res.ok) {
       let msg=`HTTP ${res.status}`;
       try{ const e=await res.json(); msg=e.error?.message||msg; }catch{}
@@ -874,12 +1091,29 @@ async function sendMessage() {
     await window._firebase?.saveConversation(activeChatId);
 
   } catch(e) {
-    bubble.innerHTML=`<span style="color:#c0392b;font-size:14px">⚠ Error: ${e.message}</span>`;
-    if(!thinkingText)thinkWrap.remove();
+    if (e.name === 'AbortError') {
+      // User stopped the response — render what we have so far
+      stopped = true;
+      if (responseText) {
+        bubble.innerHTML = md(responseText) + '<span style="display:inline-block;font-size:11px;color:var(--text3);margin-left:6px;vertical-align:middle">· stopped</span>';
+      } else {
+        bubble.innerHTML = '<span style="color:var(--text3);font-size:14px">Stopped.</span>';
+      }
+      if (!thinkingText) thinkWrap.remove();
+      if (responseText) {
+        conv.history.push({ role:'assistant', content: responseText });
+        conv.htmlSnapshot = wrap.innerHTML;
+        await window._firebase?.saveConversation(activeChatId);
+      }
+    } else {
+      bubble.innerHTML=`<span style="color:#c0392b;font-size:14px">⚠ Error: ${e.message}</span>`;
+      if(!thinkingText)thinkWrap.remove();
+    }
   }
 
+  abortController = null;
   isStreaming=false;
-  document.getElementById('sendBtn').disabled=false;
+  setStreamingUI(false);
 }
 
 function toggleThink(header){
