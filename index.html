@@ -817,7 +817,7 @@ async function sendMessage() {
 
   try {
     const reqBody = {
-      model:'claude-sonnet-4-6', max_tokens:cfg.max_tokens,
+      model:'claude-opus-4-7', max_tokens:cfg.max_tokens,
       system:SYSTEM, messages:conv.history, stream:true,
     };
     if (cfg.enabled) reqBody.thinking = { type:'enabled', budget_tokens:cfg.budget };
