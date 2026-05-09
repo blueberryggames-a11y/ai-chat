@@ -292,7 +292,7 @@ textarea::placeholder{color:var(--text3)}
     <!-- Credit bar -->
     <div class="credit-bar-wrap" id="creditBarWrap" style="display:none">
       <div class="credit-bar-row">
-        <span class="credit-bar-label"><b id="creditBarNum">100</b> / 100 credits remaining today</span>
+        <span class="credit-bar-label"><b id="creditBarNum">45</b> / 45 credits remaining today</span>
         <span class="credit-bar-label" id="creditCostHint" style="font-size:10px"></span>
       </div>
       <div class="credit-bar-bg">
@@ -339,7 +339,7 @@ const db       = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
 // ── CREDIT SYSTEM ──────────────────────────────────────────────────────────
-const DAILY_CREDITS  = 25;
+const DAILY_CREDITS  = 45;
 const CREDIT_COST    = { normal: 1, extended: 3, max: 8 };
 let   currentCredits = DAILY_CREDITS;
 let   currentUser    = null;
