@@ -12,10 +12,10 @@
   --bg:#f4f1ec;--surface:#faf9f7;--surface2:#f0ede7;
   --border:rgba(60,50,35,0.1);--border2:rgba(60,50,35,0.16);
   --text:#1c1a16;--text2:#6a6355;--text3:#a09890;
-  --accent:#c4533a;
+  --accent:#c4533a;--accent2:#9b3d28;
   --think-bg:#f5f2eb;--think-border:#ddd8ce;--think-text:#7a7060;
   --user-bg:#1c1a16;--user-text:#f4f1ec;
-  --sidebar:220px;--r:18px;
+  --sidebar:224px;--r:18px;
 }
 html,body{height:100%;overflow:hidden}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex}
@@ -30,7 +30,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .new-chat-btn svg{width:14px;height:14px;flex-shrink:0}
 .sidebar-label{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:12px 14px 6px}
 .chat-list{flex:1;overflow-y:auto;padding:0 8px 12px}
-.chat-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;cursor:pointer;transition:background .15s;font-size:13px;color:var(--text2);position:relative;group:true}
+.chat-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;cursor:pointer;transition:background .15s;font-size:13px;color:var(--text2);position:relative}
 .chat-item:hover{background:var(--surface2)}
 .chat-item.active{background:var(--surface2);color:var(--text)}
 .chat-item-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
@@ -44,9 +44,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
 /* TOP BAR */
-.topbar{display:flex;align-items:center;padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:12px}
+.topbar{display:flex;align-items:center;padding:11px 20px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:10px}
 .topbar-title{font-family:'Instrument Serif',serif;font-size:17px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.model-pill{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:3px 11px;white-space:nowrap}
+
+/* THINKING MODE TOGGLE */
+.think-mode-group{display:flex;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:3px}
+.think-mode-btn{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;padding:4px 11px;border-radius:100px;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.think-mode-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.think-mode-btn.active.max-btn{background:var(--accent);color:#fff}
 
 /* CHAT */
 .chat-wrap{flex:1;overflow-y:auto;padding:32px 0 16px;scroll-behavior:smooth}
@@ -54,7 +59,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px;text-align:center;animation:fadeIn .6s ease}
 .empty svg{width:44px;height:44px;color:var(--accent);opacity:.55}
 .empty h1{font-family:'Instrument Serif',serif;font-size:clamp(24px,4vw,38px);font-weight:400;line-height:1.2}
-.empty p{font-size:14px;color:var(--text2);max-width:380px;line-height:1.65}
+.empty p{font-size:14px;color:var(--text2);max-width:400px;line-height:1.65}
+.empty-modes{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;justify-content:center}
+.empty-mode-chip{font-size:12px;padding:5px 12px;border-radius:100px;border:1px solid var(--border2);color:var(--text2);background:var(--surface)}
+.empty-mode-chip span{font-weight:500;color:var(--text)}
 
 /* MESSAGES */
 .msg{display:flex;flex-direction:column;gap:8px;animation:slideUp .3s ease}
@@ -64,6 +72,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .bubble-user{background:var(--user-bg);color:var(--user-text);border-bottom-right-radius:5px}
 .bubble-assistant{background:var(--surface);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:5px}
 
+/* USER IMAGE PREVIEWS IN CHAT */
+.user-images{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:85%}
+.user-img-thumb{width:130px;height:100px;object-fit:cover;border-radius:10px;border:2px solid rgba(255,255,255,0.08)}
+
 /* THINKING */
 .think-wrap{max-width:85%;border:1px solid var(--think-border);border-radius:var(--r);border-bottom-left-radius:5px;overflow:hidden;background:var(--think-bg)}
 .think-header{display:flex;align-items:center;gap:8px;padding:9px 13px;cursor:pointer;user-select:none}
@@ -71,25 +83,42 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .think-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0}
 .think-dot.pulsing{animation:pulse 1.2s ease-in-out infinite}
 .think-label{font-size:11px;font-weight:500;color:var(--think-text);letter-spacing:.05em;text-transform:uppercase;flex:1}
+.think-badge{font-size:10px;padding:2px 8px;border-radius:100px;background:rgba(196,83,58,0.13);color:var(--accent);font-weight:600;letter-spacing:.04em}
 .think-chevron{font-size:12px;color:var(--think-text);transition:transform .2s}
 .think-chevron.open{transform:rotate(180deg)}
-.think-body{padding:10px 13px;font-family:monospace;font-size:12px;color:var(--think-text);line-height:1.7;white-space:pre-wrap;word-break:break-word;display:none;border-top:1px solid var(--think-border)}
+.think-body{padding:10px 13px;font-family:monospace;font-size:12px;color:var(--think-text);line-height:1.7;white-space:pre-wrap;word-break:break-word;display:none;border-top:1px solid var(--think-border);max-height:300px;overflow-y:auto}
 .think-body.visible{display:block}
 .cursor{display:inline-block;width:2px;height:1em;background:var(--accent);vertical-align:text-bottom;animation:blink .7s step-end infinite;margin-left:2px}
 
 /* INPUT */
-.input-wrap{flex-shrink:0;padding:14px 24px 22px;background:var(--bg)}
-.input-box{max-width:720px;margin:0 auto;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:13px 15px 11px;display:flex;flex-direction:column;gap:9px;box-shadow:0 2px 12px rgba(0,0,0,0.05);transition:border-color .2s,box-shadow .2s}
+.input-wrap{flex-shrink:0;padding:10px 24px 20px;background:var(--bg)}
+.input-box{max-width:720px;margin:0 auto;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:11px 13px 10px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 12px rgba(0,0,0,0.05);transition:border-color .2s,box-shadow .2s}
 .input-box:focus-within{border-color:rgba(196,83,58,0.3);box-shadow:0 2px 18px rgba(196,83,58,0.07)}
-textarea{font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);background:transparent;border:none;outline:none;resize:none;min-height:24px;max-height:180px;line-height:1.6;overflow-y:auto}
+.drag-over .input-box{border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,83,58,0.12)}
+
+/* IMAGE PREVIEW STRIP */
+.img-preview-strip{display:flex;flex-wrap:wrap;gap:6px}
+.img-preview-strip:empty{display:none}
+.img-thumb{position:relative;width:58px;height:58px;border-radius:8px;overflow:hidden;border:1px solid var(--border2);flex-shrink:0}
+.img-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.img-thumb-remove{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.65);color:#fff;border:none;cursor:pointer;font-size:9px;display:flex;align-items:center;justify-content:center}
+.img-thumb-remove:hover{background:var(--accent)}
+
+textarea{font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);background:transparent;border:none;outline:none;resize:none;min-height:24px;max-height:160px;line-height:1.6;overflow-y:auto;width:100%}
 textarea::placeholder{color:var(--text3)}
-.input-footer{display:flex;align-items:center;justify-content:space-between}
-.input-hint{font-size:11px;color:var(--text3)}
-.send-btn{display:flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:7px 16px;border-radius:100px;border:none;background:var(--accent);color:#fff;cursor:pointer;transition:opacity .15s,transform .1s}
+.input-footer{display:flex;align-items:center;gap:8px}
+.input-hint{font-size:11px;color:var(--text3);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.attach-btn{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;transition:background .15s,color .15s;flex-shrink:0}
+.attach-btn:hover{background:var(--surface2);color:var(--text)}
+.attach-btn svg{width:15px;height:15px}
+
+.send-btn{display:flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:7px 16px;border-radius:100px;border:none;background:var(--accent);color:#fff;cursor:pointer;transition:opacity .15s,transform .1s;flex-shrink:0}
 .send-btn:hover{opacity:.88}
 .send-btn:active{transform:scale(.97)}
 .send-btn:disabled{opacity:.4;cursor:not-allowed}
 .send-btn svg{width:13px;height:13px}
+#fileInput{display:none}
 
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -136,7 +165,11 @@ textarea::placeholder{color:var(--text3)}
 <div class="main">
   <div class="topbar">
     <span class="topbar-title" id="topbarTitle">New conversation</span>
-    <span class="model-pill">claude-sonnet-4-5 · extended thinking</span>
+    <div class="think-mode-group">
+      <button class="think-mode-btn active" id="modeNormal"   onclick="setThinkMode('normal')">Normal</button>
+      <button class="think-mode-btn"        id="modeExtended" onclick="setThinkMode('extended')">Extended</button>
+      <button class="think-mode-btn max-btn" id="modeMax"     onclick="setThinkMode('max')">Max Thinking</button>
+    </div>
   </div>
 
   <div class="chat-wrap" id="chatWrap">
@@ -144,22 +177,32 @@ textarea::placeholder{color:var(--text3)}
       <div class="empty" id="emptyState">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/></svg>
         <h1>Start a conversation</h1>
-        <p>Ask me anything. I'll show my reasoning in real-time when thinking through complex problems.</p>
+        <p>Ask anything, upload images, or dial up the thinking for deep problems.</p>
+        <div class="empty-modes">
+          <div class="empty-mode-chip"><span>Normal</span> — fast replies</div>
+          <div class="empty-mode-chip"><span>Extended</span> — ~10s reasoning</div>
+          <div class="empty-mode-chip"><span>Max</span> — ~30s deep thinking</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="input-wrap">
-    <div class="input-box">
+  <div class="input-wrap" id="inputWrap">
+    <div class="input-box" id="inputBox">
+      <div class="img-preview-strip" id="imgPreviewStrip"></div>
       <textarea id="userInput" placeholder="Message Claude…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
       <div class="input-footer">
-        <span class="input-hint">Enter to send · Shift+Enter for newline</span>
+        <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Attach image">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </button>
+        <span class="input-hint" id="inputHint">Enter to send · Shift+Enter for newline</span>
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           Send
         </button>
       </div>
     </div>
+    <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFileSelect(event)">
   </div>
 </div>
 
@@ -181,7 +224,6 @@ RESPONSE QUALITY:
 - Use concrete examples over abstract explanations whenever possible
 - Match your depth to the question: brief for simple queries, thorough for complex ones
 - When uncertain, say so clearly rather than hedging vaguely
-- Structure long responses with clear sections, but don't over-format short ones
 
 PERSONALITY:
 - Be warm but not sycophantic — never open with "Great question!" or similar
@@ -198,16 +240,41 @@ CAPABILITIES:
 - Code: write clean, well-commented, production-ready code by default
 - Math: work through problems carefully, showing steps
 - Analysis: go beyond surface-level — find the non-obvious angle
+- Vision: when images are provided, analyze them carefully and in detail
 
 You have extended thinking enabled. Use it genuinely as your scratchpad for hard problems.`;
 
-// ── CONVERSATION STATE ────────────────────────────────────────────────────────
-let conversations = {}; // { id: { title, history, htmlSnapshot } }
-let activeChatId = null;
-let isStreaming = false;
-let msgCounter = 0;
+// ── THINKING MODES ────────────────────────────────────────────────────────────
+// normal   = thinking disabled (fastest, cheapest)
+// extended = budget_tokens 10 000  (~10s)
+// max      = budget_tokens 32 000  (~30s deep)
+const THINK_CONFIG = {
+  normal:   { enabled: false, budget: 0,     max_tokens: 8192,  label: 'Thinking' },
+  extended: { enabled: true,  budget: 10000, max_tokens: 16000, label: 'Extended reasoning' },
+  max:      { enabled: true,  budget: 32000, max_tokens: 32000, label: 'Max thinking' },
+};
+let thinkMode = 'normal';
 
-function genId() { return 'chat_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+function setThinkMode(mode) {
+  thinkMode = mode;
+  ['Normal','Extended','Max'].forEach(m =>
+    document.getElementById('mode'+m)?.classList.remove('active')
+  );
+  document.getElementById('mode' + mode.charAt(0).toUpperCase() + mode.slice(1))?.classList.add('active');
+  const hint = document.getElementById('inputHint');
+  if (mode === 'max')      hint.textContent = 'Max thinking — ~30s deep reasoning per reply';
+  else if (mode === 'extended') hint.textContent = 'Extended thinking — ~10s reasoning per reply';
+  else hint.textContent = 'Enter to send · Shift+Enter for newline';
+}
+
+// ── CONVERSATION STATE ────────────────────────────────────────────────────────
+let conversations = {};
+let activeChatId  = null;
+let isStreaming   = false;
+let msgCounter    = 0;
+let pendingImages = []; // [{ dataUrl, base64, mediaType, name }]
+
+function genId() { return 'c' + Date.now() + Math.random().toString(36).slice(2,6); }
 
 function newChat() {
   if (isStreaming) return;
@@ -220,10 +287,7 @@ function newChat() {
 
 function switchChat(id) {
   if (isStreaming || id === activeChatId) return;
-  // Save snapshot of current chat
-  if (activeChatId) {
-    conversations[activeChatId].htmlSnapshot = document.getElementById('chatInner').innerHTML;
-  }
+  if (activeChatId) conversations[activeChatId].htmlSnapshot = document.getElementById('chatInner').innerHTML;
   activeChatId = id;
   renderSidebar();
   renderChat();
@@ -234,24 +298,18 @@ function deleteChat(e, id) {
   delete conversations[id];
   if (activeChatId === id) {
     const remaining = Object.keys(conversations);
-    if (remaining.length > 0) {
-      activeChatId = remaining[remaining.length - 1];
-    } else {
-      newChat();
-      return;
-    }
+    if (remaining.length) { activeChatId = remaining[remaining.length-1]; renderSidebar(); renderChat(); }
+    else { newChat(); }
+    return;
   }
   renderSidebar();
-  renderChat();
 }
 
 function renderSidebar() {
   const list = document.getElementById('chatList');
-  const ids = Object.keys(conversations).reverse();
-  list.innerHTML = ids.map(id => {
+  list.innerHTML = Object.keys(conversations).reverse().map(id => {
     const c = conversations[id];
-    const active = id === activeChatId ? 'active' : '';
-    return `<div class="chat-item ${active}" onclick="switchChat('${id}')">
+    return `<div class="chat-item ${id===activeChatId?'active':''}" onclick="switchChat('${id}')">
       <span class="chat-item-dot"></span>
       <span class="chat-item-title">${escHtml(c.title)}</span>
       <button class="chat-delete" onclick="deleteChat(event,'${id}')" title="Delete">✕</button>
@@ -262,85 +320,137 @@ function renderSidebar() {
 function renderChat() {
   const conv = conversations[activeChatId];
   document.getElementById('topbarTitle').textContent = conv.title;
-
-  if (conv.htmlSnapshot) {
-    document.getElementById('chatInner').innerHTML = conv.htmlSnapshot;
-  } else {
-    document.getElementById('chatInner').innerHTML = `<div class="empty" id="emptyState">
+  document.getElementById('chatInner').innerHTML = conv.htmlSnapshot ||
+    `<div class="empty" id="emptyState">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/></svg>
       <h1>Start a conversation</h1>
-      <p>Ask me anything. I'll show my reasoning in real-time when thinking through complex problems.</p>
+      <p>Ask anything, upload images, or dial up the thinking for deep problems.</p>
+      <div class="empty-modes">
+        <div class="empty-mode-chip"><span>Normal</span> — fast replies</div>
+        <div class="empty-mode-chip"><span>Extended</span> — ~10s reasoning</div>
+        <div class="empty-mode-chip"><span>Max</span> — ~30s deep thinking</div>
+      </div>
     </div>`;
-  }
   scrollBottom();
 }
 
-// ── HELPERS ───────────────────────────────────────────────────────────────────
-function escHtml(t) {
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// ── IMAGE HANDLING ────────────────────────────────────────────────────────────
+function handleFileSelect(e) {
+  Array.from(e.target.files).forEach(loadImageFile);
+  e.target.value = '';
 }
 
-function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 180) + 'px'; }
-function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
-function scrollBottom() { const w = document.getElementById('chatWrap'); w.scrollTop = w.scrollHeight; }
+function loadImageFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const dataUrl = ev.target.result;
+    pendingImages.push({ dataUrl, base64: dataUrl.split(',')[1], mediaType: file.type, name: file.name });
+    renderPreviews();
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderPreviews() {
+  document.getElementById('imgPreviewStrip').innerHTML = pendingImages.map((img, i) =>
+    `<div class="img-thumb">
+      <img src="${img.dataUrl}" alt="">
+      <button class="img-thumb-remove" onclick="removeImage(${i})">✕</button>
+    </div>`
+  ).join('');
+}
+
+function removeImage(i) { pendingImages.splice(i,1); renderPreviews(); }
+
+// Drag & drop
+const inputWrap = document.getElementById('inputWrap');
+inputWrap.addEventListener('dragover', e => { e.preventDefault(); inputWrap.classList.add('drag-over'); });
+inputWrap.addEventListener('dragleave', () => inputWrap.classList.remove('drag-over'));
+inputWrap.addEventListener('drop', e => {
+  e.preventDefault(); inputWrap.classList.remove('drag-over');
+  Array.from(e.dataTransfer.files).forEach(loadImageFile);
+});
+
+// Paste
+document.addEventListener('paste', e => {
+  Array.from(e.clipboardData?.items || []).forEach(item => {
+    if (item.type.startsWith('image/')) { const f = item.getAsFile(); if (f) loadImageFile(f); }
+  });
+});
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function escHtml(t) { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,160)+'px'; }
+function handleKey(e) { if (e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } }
+function scrollBottom() { const w=document.getElementById('chatWrap'); w.scrollTop=w.scrollHeight; }
 
 function md(text) {
   let h = text
-    .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-    .replace(/^---$/gm, '<hr>')
-    .replace(/^[\*\-] (.+)$/gm, '<li>$1</li>')
-    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/\n/g, '<br>');
-  h = h.replace(/((<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>');
-  if (!h.match(/^<(h[1-3]|ul|ol|pre|blockquote|hr)/)) h = '<p>' + h + '</p>';
+    .replace(/```(\w*)\n?([\s\S]*?)```/g,'<pre><code>$2</code></pre>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
+    .replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+    .replace(/^---$/gm,'<hr>')
+    .replace(/^[\*\-] (.+)$/gm,'<li>$1</li>')
+    .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
+    .replace(/\n\n/g,'</p><p>')
+    .replace(/\n/g,'<br>');
+  h = h.replace(/((<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>');
+  if (!h.match(/^<(h[1-3]|ul|ol|pre|blockquote|hr)/)) h='<p>'+h+'</p>';
   return h;
 }
 
-// ── SEND MESSAGE ──────────────────────────────────────────────────────────────
+// ── SEND ──────────────────────────────────────────────────────────────────────
 async function sendMessage() {
   if (isStreaming) return;
-  const ta = document.getElementById('userInput');
+  const ta   = document.getElementById('userInput');
   const text = ta.value.trim();
-  if (!text) return;
+  const imgs = [...pendingImages];
+  if (!text && imgs.length === 0) return;
+
   ta.value = ''; ta.style.height = 'auto';
+  pendingImages = []; renderPreviews();
   isStreaming = true;
   document.getElementById('sendBtn').disabled = true;
 
   const conv = conversations[activeChatId];
+  const cfg  = THINK_CONFIG[thinkMode];
 
-  // Remove empty state
   document.getElementById('emptyState')?.remove();
-
   const wrap = document.getElementById('chatInner');
 
   // User bubble
   const uDiv = document.createElement('div');
   uDiv.className = 'msg msg-user';
-  uDiv.innerHTML = `<div class="bubble bubble-user">${escHtml(text).replace(/\n/g,'<br>')}</div>`;
+  let uHtml = '';
+  if (imgs.length) uHtml += `<div class="user-images">${imgs.map(i=>`<img class="user-img-thumb" src="${i.dataUrl}" alt="">`).join('')}</div>`;
+  if (text)        uHtml += `<div class="bubble bubble-user">${escHtml(text).replace(/\n/g,'<br>')}</div>`;
+  uDiv.innerHTML = uHtml;
   wrap.appendChild(uDiv);
   scrollBottom();
-  conv.history.push({ role: 'user', content: text });
 
-  // Update title from first message
+  // Build API content array (images first, then text)
+  const userContent = [];
+  imgs.forEach(img => userContent.push({ type:'image', source:{ type:'base64', media_type:img.mediaType, data:img.base64 } }));
+  if (text) userContent.push({ type:'text', text });
+
+  conv.history.push({ role:'user', content: userContent });
+
+  // Auto-title
   if (conv.history.length === 1) {
-    conv.title = text.length > 36 ? text.slice(0, 36) + '…' : text;
+    const t = text || (imgs.length ? 'Image' : 'New conversation');
+    conv.title = t.length > 36 ? t.slice(0,36)+'…' : t;
     document.getElementById('topbarTitle').textContent = conv.title;
     renderSidebar();
   }
 
-  // Unique ID per message to avoid think-body collisions
-  const msgId = ++msgCounter;
-
   // Assistant container
+  const msgId = ++msgCounter;
   const msgDiv = document.createElement('div');
   msgDiv.className = 'msg msg-assistant';
   wrap.appendChild(msgDiv);
@@ -348,10 +458,12 @@ async function sendMessage() {
   const thinkWrap = document.createElement('div');
   thinkWrap.className = 'think-wrap';
   thinkWrap.style.display = 'none';
+  const badge = thinkMode==='max' ? '<span class="think-badge">MAX</span>' : '';
   thinkWrap.innerHTML = `
     <div class="think-header" onclick="toggleThink(this)">
       <span class="think-dot pulsing"></span>
       <span class="think-label">Thinking…</span>
+      ${badge}
       <span class="think-chevron open">▾</span>
     </div>
     <div class="think-body visible" id="thinkBody-${msgId}"></div>`;
@@ -363,70 +475,66 @@ async function sendMessage() {
   msgDiv.appendChild(bubble);
   scrollBottom();
 
-  let thinkingText = '', responseText = '', inThinking = false, inText = false;
+  let thinkingText='', responseText='', inThinking=false, inText=false;
 
   try {
-    const res = await fetch(PROXY_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'interleaved-thinking-2025-05-14'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 16000,
-        thinking: { type: 'enabled', budget_tokens: 10000 },
-        system: SYSTEM,
-        messages: conv.history,
-        stream: true
-      })
-    });
+    const reqBody = {
+      model: 'claude-sonnet-4-5',
+      max_tokens: cfg.max_tokens,
+      system: SYSTEM,
+      messages: conv.history,
+      stream: true,
+    };
+    if (cfg.enabled) reqBody.thinking = { type:'enabled', budget_tokens: cfg.budget };
+
+    const headers = { 'Content-Type':'application/json', 'anthropic-version':'2023-06-01' };
+    if (cfg.enabled) headers['anthropic-beta'] = 'interleaved-thinking-2025-05-14';
+
+    const res = await fetch(PROXY_URL, { method:'POST', headers, body: JSON.stringify(reqBody) });
 
     if (!res.ok) {
       let msg = `HTTP ${res.status}`;
-      try { const e = await res.json(); msg = e.error?.message || msg; } catch {}
+      try { const e=await res.json(); msg=e.error?.message||msg; } catch{}
       throw new Error(msg);
     }
 
     const reader = res.body.getReader();
-    const dec = new TextDecoder();
+    const dec    = new TextDecoder();
     let buf = '';
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      buf += dec.decode(value, { stream: true });
-      const lines = buf.split('\n');
-      buf = lines.pop();
+      buf += dec.decode(value, { stream:true });
+      const lines = buf.split('\n'); buf = lines.pop();
       for (const line of lines) {
         if (!line.startsWith('data:')) continue;
-        const data = line.slice(5).trim();
-        if (data === '[DONE]') continue;
-        let evt; try { evt = JSON.parse(data); } catch { continue; }
+        const raw = line.slice(5).trim();
+        if (raw==='[DONE]') continue;
+        let evt; try { evt=JSON.parse(raw); } catch { continue; }
 
-        if (evt.type === 'content_block_start') {
-          if (evt.content_block?.type === 'thinking') {
-            inThinking = true; inText = false;
-            thinkWrap.style.display = 'block';
-          } else if (evt.content_block?.type === 'text') {
-            inThinking = false; inText = true;
+        if (evt.type==='content_block_start') {
+          if (evt.content_block?.type==='thinking') {
+            inThinking=true; inText=false;
+            thinkWrap.style.display='block';
+          } else if (evt.content_block?.type==='text') {
+            inThinking=false; inText=true;
             thinkWrap.querySelector('.think-dot')?.classList.remove('pulsing');
-            const lbl = thinkWrap.querySelector('.think-label');
-            if (lbl) lbl.textContent = 'Reasoning';
+            const lbl=thinkWrap.querySelector('.think-label');
+            if (lbl) lbl.textContent = cfg.label;
           }
         }
 
-        if (evt.type === 'content_block_delta') {
-          if (evt.delta?.type === 'thinking_delta' && inThinking) {
-            thinkingText += evt.delta.thinking || '';
-            const tb = document.getElementById(`thinkBody-${msgId}`);
-            if (tb) tb.textContent = thinkingText;
+        if (evt.type==='content_block_delta') {
+          if (evt.delta?.type==='thinking_delta' && inThinking) {
+            thinkingText += evt.delta.thinking||'';
+            const tb=document.getElementById(`thinkBody-${msgId}`);
+            if (tb) tb.textContent=thinkingText;
             scrollBottom();
           }
-          if (evt.delta?.type === 'text_delta' && inText) {
-            responseText += evt.delta.text || '';
-            bubble.innerHTML = md(responseText) + '<span class="cursor"></span>';
+          if (evt.delta?.type==='text_delta' && inText) {
+            responseText += evt.delta.text||'';
+            bubble.innerHTML = md(responseText)+'<span class="cursor"></span>';
             scrollBottom();
           }
         }
@@ -435,11 +543,10 @@ async function sendMessage() {
 
     bubble.innerHTML = md(responseText);
     if (!thinkingText) thinkWrap.remove();
-    conv.history.push({ role: 'assistant', content: responseText });
-    // Save snapshot after response
+    conv.history.push({ role:'assistant', content: responseText });
     conv.htmlSnapshot = wrap.innerHTML;
 
-  } catch (e) {
+  } catch(e) {
     bubble.innerHTML = `<span style="color:#c0392b;font-size:14px">⚠ Error: ${e.message}</span>`;
     if (!thinkingText) thinkWrap.remove();
   }
