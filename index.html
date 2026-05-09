@@ -15,26 +15,45 @@
   --accent:#c4533a;
   --think-bg:#f5f2eb;--think-border:#ddd8ce;--think-text:#7a7060;
   --user-bg:#1c1a16;--user-text:#f4f1ec;
-  --r:18px;
+  --sidebar:220px;--r:18px;
 }
 html,body{height:100%;overflow:hidden}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.sidebar-top{padding:14px 14px 10px;border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:8px;font-family:'Instrument Serif',serif;font-size:18px;color:var(--text);margin-bottom:12px}
+.logo svg{width:22px;height:22px;color:var(--accent)}
+.new-chat-btn{width:100%;display:flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:8px 12px;border-radius:10px;border:1px dashed var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:background .15s,color .15s}
+.new-chat-btn:hover{background:var(--surface2);color:var(--text)}
+.new-chat-btn svg{width:14px;height:14px;flex-shrink:0}
+.sidebar-label{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:12px 14px 6px}
+.chat-list{flex:1;overflow-y:auto;padding:0 8px 12px}
+.chat-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;cursor:pointer;transition:background .15s;font-size:13px;color:var(--text2);position:relative;group:true}
+.chat-item:hover{background:var(--surface2)}
+.chat-item.active{background:var(--surface2);color:var(--text)}
+.chat-item-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.chat-item-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;opacity:0}
+.chat-item.active .chat-item-dot{opacity:1}
+.chat-delete{display:none;align-items:center;justify-content:center;width:18px;height:18px;border-radius:5px;border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:13px;padding:0;flex-shrink:0}
+.chat-delete:hover{background:rgba(196,83,58,0.12);color:var(--accent)}
+.chat-item:hover .chat-delete{display:flex}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
 /* TOP BAR */
 .topbar{display:flex;align-items:center;padding:12px 24px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:12px}
-.logo{display:flex;align-items:center;gap:9px;font-family:'Instrument Serif',serif;font-size:20px;color:var(--text);text-decoration:none}
-.logo svg{width:26px;height:26px;color:var(--accent)}
-.spacer{flex:1}
-.model-pill{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:3px 11px}
-.clear-btn{font-family:'DM Sans',sans-serif;font-size:12px;padding:5px 14px;border-radius:100px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:background .15s,color .15s}
-.clear-btn:hover{background:var(--surface2);color:var(--text)}
+.topbar-title{font-family:'Instrument Serif',serif;font-size:17px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.model-pill{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:3px 11px;white-space:nowrap}
 
 /* CHAT */
 .chat-wrap{flex:1;overflow-y:auto;padding:32px 0 16px;scroll-behavior:smooth}
 .chat-inner{max-width:720px;margin:0 auto;padding:0 24px;display:flex;flex-direction:column;gap:24px}
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px;text-align:center;animation:fadeIn .6s ease}
 .empty svg{width:44px;height:44px;color:var(--accent);opacity:.55}
-.empty h1{font-family:'Instrument Serif',serif;font-size:clamp(26px,4vw,40px);font-weight:400;line-height:1.2}
+.empty h1{font-family:'Instrument Serif',serif;font-size:clamp(24px,4vw,38px);font-weight:400;line-height:1.2}
 .empty p{font-size:14px;color:var(--text2);max-width:380px;line-height:1.65}
 
 /* MESSAGES */
@@ -97,46 +116,59 @@ textarea::placeholder{color:var(--text3)}
 </head>
 <body>
 
-<div class="topbar">
-  <a class="logo" href="#">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/></svg>
-    Claude
-  </a>
-  <div class="spacer"></div>
-  <span class="model-pill">claude-sonnet-4-5 · extended thinking</span>
-  <button class="clear-btn" onclick="clearChat()">Clear chat</button>
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-top">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/></svg>
+      Claude
+    </div>
+    <button class="new-chat-btn" onclick="newChat()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New conversation
+    </button>
+  </div>
+  <div class="sidebar-label">Conversations</div>
+  <div class="chat-list" id="chatList"></div>
 </div>
 
-<div class="chat-wrap" id="chatWrap">
-  <div class="chat-inner" id="chatInner">
-    <div class="empty" id="emptyState">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/></svg>
-      <h1>Good evening</h1>
-      <p>Ask me anything. I'll show my reasoning in real-time when thinking through complex problems.</p>
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <span class="topbar-title" id="topbarTitle">New conversation</span>
+    <span class="model-pill">claude-sonnet-4-5 · extended thinking</span>
+  </div>
+
+  <div class="chat-wrap" id="chatWrap">
+    <div class="chat-inner" id="chatInner">
+      <div class="empty" id="emptyState">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/></svg>
+        <h1>Start a conversation</h1>
+        <p>Ask me anything. I'll show my reasoning in real-time when thinking through complex problems.</p>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="input-wrap">
-  <div class="input-box">
-    <textarea id="userInput" placeholder="Message Claude…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-    <div class="input-footer">
-      <span class="input-hint">Enter to send · Shift+Enter for newline</span>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        Send
-      </button>
+  <div class="input-wrap">
+    <div class="input-box">
+      <textarea id="userInput" placeholder="Message Claude…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <div class="input-footer">
+        <span class="input-hint">Enter to send · Shift+Enter for newline</span>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-// ── CONFIG — update these two values ─────────────────────────────────────────
-const API_KEY   = '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';
-const PROXY_URL = 'https://green-paper-910b.xxgoldenwarriors.workers.dev/';
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const PROXY_URL = 'REPLACE_WITH_YOUR_WORKER_URL';
 // ─────────────────────────────────────────────────────────────────────────────
 
-const SYSTEM=`You are an exceptionally capable AI assistant. Your goal is to provide the most accurate, insightful, and genuinely helpful responses possible.
+const SYSTEM = `You are an exceptionally capable AI assistant. Your goal is to provide the most accurate, insightful, and genuinely helpful responses possible.
 
 THINKING & REASONING:
 - Before answering complex questions, think step-by-step in your extended thinking
@@ -169,168 +201,263 @@ CAPABILITIES:
 
 You have extended thinking enabled. Use it genuinely as your scratchpad for hard problems.`;
 
-let history=[];
-let isStreaming=false;
+// ── CONVERSATION STATE ────────────────────────────────────────────────────────
+let conversations = {}; // { id: { title, history, htmlSnapshot } }
+let activeChatId = null;
+let isStreaming = false;
+let msgCounter = 0;
 
-function clearChat(){
-  history=[];
-  const inner=document.getElementById('chatInner');
-  inner.innerHTML=`<div class="empty" id="emptyState">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/></svg>
-    <h1>Good evening</h1>
-    <p>Ask me anything. I'll show my reasoning in real-time when thinking through complex problems.</p>
-  </div>`;
+function genId() { return 'chat_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+
+function newChat() {
+  if (isStreaming) return;
+  const id = genId();
+  conversations[id] = { title: 'New conversation', history: [], htmlSnapshot: '' };
+  activeChatId = id;
+  renderSidebar();
+  renderChat();
 }
 
-function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,180)+'px';}
-function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
-function scrollBottom(){const w=document.getElementById('chatWrap');w.scrollTop=w.scrollHeight;}
+function switchChat(id) {
+  if (isStreaming || id === activeChatId) return;
+  // Save snapshot of current chat
+  if (activeChatId) {
+    conversations[activeChatId].htmlSnapshot = document.getElementById('chatInner').innerHTML;
+  }
+  activeChatId = id;
+  renderSidebar();
+  renderChat();
+}
 
-function md(text){
-  let h=text
-    .replace(/```(\w*)\n?([\s\S]*?)```/g,'<pre><code>$2</code></pre>')
-    .replace(/`([^`]+)`/g,'<code>$1</code>')
-    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
-    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
-    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
-    .replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g,'<em>$1</em>')
-    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
-    .replace(/^---$/gm,'<hr>')
-    .replace(/^[\*\-] (.+)$/gm,'<li>$1</li>')
-    .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
-    .replace(/\n\n/g,'</p><p>')
-    .replace(/\n/g,'<br>');
-  h=h.replace(/((<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>');
-  if(!h.match(/^<(h[1-3]|ul|ol|pre|blockquote|hr)/))h='<p>'+h+'</p>';
+function deleteChat(e, id) {
+  e.stopPropagation();
+  delete conversations[id];
+  if (activeChatId === id) {
+    const remaining = Object.keys(conversations);
+    if (remaining.length > 0) {
+      activeChatId = remaining[remaining.length - 1];
+    } else {
+      newChat();
+      return;
+    }
+  }
+  renderSidebar();
+  renderChat();
+}
+
+function renderSidebar() {
+  const list = document.getElementById('chatList');
+  const ids = Object.keys(conversations).reverse();
+  list.innerHTML = ids.map(id => {
+    const c = conversations[id];
+    const active = id === activeChatId ? 'active' : '';
+    return `<div class="chat-item ${active}" onclick="switchChat('${id}')">
+      <span class="chat-item-dot"></span>
+      <span class="chat-item-title">${escHtml(c.title)}</span>
+      <button class="chat-delete" onclick="deleteChat(event,'${id}')" title="Delete">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function renderChat() {
+  const conv = conversations[activeChatId];
+  document.getElementById('topbarTitle').textContent = conv.title;
+
+  if (conv.htmlSnapshot) {
+    document.getElementById('chatInner').innerHTML = conv.htmlSnapshot;
+  } else {
+    document.getElementById('chatInner').innerHTML = `<div class="empty" id="emptyState">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/></svg>
+      <h1>Start a conversation</h1>
+      <p>Ask me anything. I'll show my reasoning in real-time when thinking through complex problems.</p>
+    </div>`;
+  }
+  scrollBottom();
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 180) + 'px'; }
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function scrollBottom() { const w = document.getElementById('chatWrap'); w.scrollTop = w.scrollHeight; }
+
+function md(text) {
+  let h = text
+    .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/^---$/gm, '<hr>')
+    .replace(/^[\*\-] (.+)$/gm, '<li>$1</li>')
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  h = h.replace(/((<li>.*?<\/li>\s*)+)/g, '<ul>$1</ul>');
+  if (!h.match(/^<(h[1-3]|ul|ol|pre|blockquote|hr)/)) h = '<p>' + h + '</p>';
   return h;
 }
 
-async function sendMessage(){
-  if(isStreaming)return;
-  const ta=document.getElementById('userInput');
-  const text=ta.value.trim();
-  if(!text)return;
-  ta.value='';ta.style.height='auto';
-  isStreaming=true;
-  document.getElementById('sendBtn').disabled=true;
+// ── SEND MESSAGE ──────────────────────────────────────────────────────────────
+async function sendMessage() {
+  if (isStreaming) return;
+  const ta = document.getElementById('userInput');
+  const text = ta.value.trim();
+  if (!text) return;
+  ta.value = ''; ta.style.height = 'auto';
+  isStreaming = true;
+  document.getElementById('sendBtn').disabled = true;
 
-  // append user bubble
+  const conv = conversations[activeChatId];
+
+  // Remove empty state
   document.getElementById('emptyState')?.remove();
-  const wrap=document.getElementById('chatInner');
-  const uDiv=document.createElement('div');
-  uDiv.className='msg msg-user';
-  uDiv.innerHTML=`<div class="bubble bubble-user">${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div>`;
+
+  const wrap = document.getElementById('chatInner');
+
+  // User bubble
+  const uDiv = document.createElement('div');
+  uDiv.className = 'msg msg-user';
+  uDiv.innerHTML = `<div class="bubble bubble-user">${escHtml(text).replace(/\n/g,'<br>')}</div>`;
   wrap.appendChild(uDiv);
   scrollBottom();
-  history.push({role:'user',content:text});
+  conv.history.push({ role: 'user', content: text });
 
-  // assistant container
-  const msgDiv=document.createElement('div');
-  msgDiv.className='msg msg-assistant';
+  // Update title from first message
+  if (conv.history.length === 1) {
+    conv.title = text.length > 36 ? text.slice(0, 36) + '…' : text;
+    document.getElementById('topbarTitle').textContent = conv.title;
+    renderSidebar();
+  }
+
+  // Unique ID per message to avoid think-body collisions
+  const msgId = ++msgCounter;
+
+  // Assistant container
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'msg msg-assistant';
   wrap.appendChild(msgDiv);
 
-  const thinkWrap=document.createElement('div');
-  thinkWrap.className='think-wrap';
-  thinkWrap.style.display='none';
-  thinkWrap.innerHTML=`<div class="think-header" onclick="toggleThink(this)"><span class="think-dot pulsing"></span><span class="think-label">Thinking…</span><span class="think-chevron open">▾</span></div><div class="think-body visible" id="thinkBody"></div>`;
+  const thinkWrap = document.createElement('div');
+  thinkWrap.className = 'think-wrap';
+  thinkWrap.style.display = 'none';
+  thinkWrap.innerHTML = `
+    <div class="think-header" onclick="toggleThink(this)">
+      <span class="think-dot pulsing"></span>
+      <span class="think-label">Thinking…</span>
+      <span class="think-chevron open">▾</span>
+    </div>
+    <div class="think-body visible" id="thinkBody-${msgId}"></div>`;
   msgDiv.appendChild(thinkWrap);
 
-  const bubble=document.createElement('div');
-  bubble.className='bubble bubble-assistant';
-  bubble.innerHTML='<span class="cursor"></span>';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble bubble-assistant';
+  bubble.innerHTML = '<span class="cursor"></span>';
   msgDiv.appendChild(bubble);
   scrollBottom();
 
-  let thinkingText='',responseText='',inThinking=false,inText=false;
+  let thinkingText = '', responseText = '', inThinking = false, inText = false;
 
-  try{
-    const res=await fetch(PROXY_URL,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        // 'x-api-key':API_KEY,
-        'anthropic-version':'2023-06-01',
-        'anthropic-beta':'interleaved-thinking-2025-05-14'
+  try {
+    const res = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'interleaved-thinking-2025-05-14'
       },
-      body:JSON.stringify({
-        model:'claude-sonnet-4-5',
-        max_tokens:16000,
-        thinking:{type:'enabled',budget_tokens:10000},
-        system:SYSTEM,
-        messages:history,
-        stream:true
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 16000,
+        thinking: { type: 'enabled', budget_tokens: 10000 },
+        system: SYSTEM,
+        messages: conv.history,
+        stream: true
       })
     });
 
-    if(!res.ok){
-      let msg=`HTTP ${res.status}`;
-      try{const e=await res.json();msg=e.error?.message||msg;}catch{}
+    if (!res.ok) {
+      let msg = `HTTP ${res.status}`;
+      try { const e = await res.json(); msg = e.error?.message || msg; } catch {}
       throw new Error(msg);
     }
 
-    const reader=res.body.getReader();
-    const dec=new TextDecoder();
-    let buf='';
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
 
-    while(true){
-      const{done,value}=await reader.read();
-      if(done)break;
-      buf+=dec.decode(value,{stream:true});
-      const lines=buf.split('\n');
-      buf=lines.pop();
-      for(const line of lines){
-        if(!line.startsWith('data:'))continue;
-        const data=line.slice(5).trim();
-        if(data==='[DONE]')continue;
-        let evt;try{evt=JSON.parse(data);}catch{continue;}
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data:')) continue;
+        const data = line.slice(5).trim();
+        if (data === '[DONE]') continue;
+        let evt; try { evt = JSON.parse(data); } catch { continue; }
 
-        if(evt.type==='content_block_start'){
-          if(evt.content_block?.type==='thinking'){inThinking=true;inText=false;thinkWrap.style.display='block';}
-          else if(evt.content_block?.type==='text'){
-            inThinking=false;inText=true;
+        if (evt.type === 'content_block_start') {
+          if (evt.content_block?.type === 'thinking') {
+            inThinking = true; inText = false;
+            thinkWrap.style.display = 'block';
+          } else if (evt.content_block?.type === 'text') {
+            inThinking = false; inText = true;
             thinkWrap.querySelector('.think-dot')?.classList.remove('pulsing');
-            const lbl=thinkWrap.querySelector('.think-label');
-            if(lbl)lbl.textContent='Reasoning';
+            const lbl = thinkWrap.querySelector('.think-label');
+            if (lbl) lbl.textContent = 'Reasoning';
           }
         }
-        if(evt.type==='content_block_delta'){
-          if(evt.delta?.type==='thinking_delta'&&inThinking){
-            thinkingText+=evt.delta.thinking||'';
-            const tb=document.getElementById('thinkBody');
-            if(tb)tb.textContent=thinkingText;
+
+        if (evt.type === 'content_block_delta') {
+          if (evt.delta?.type === 'thinking_delta' && inThinking) {
+            thinkingText += evt.delta.thinking || '';
+            const tb = document.getElementById(`thinkBody-${msgId}`);
+            if (tb) tb.textContent = thinkingText;
             scrollBottom();
           }
-          if(evt.delta?.type==='text_delta'&&inText){
-            responseText+=evt.delta.text||'';
-            bubble.innerHTML=md(responseText)+'<span class="cursor"></span>';
+          if (evt.delta?.type === 'text_delta' && inText) {
+            responseText += evt.delta.text || '';
+            bubble.innerHTML = md(responseText) + '<span class="cursor"></span>';
             scrollBottom();
           }
         }
       }
     }
 
-    bubble.innerHTML=md(responseText);
-    if(!thinkingText)thinkWrap.remove();
-    history.push({role:'assistant',content:responseText});
+    bubble.innerHTML = md(responseText);
+    if (!thinkingText) thinkWrap.remove();
+    conv.history.push({ role: 'assistant', content: responseText });
+    // Save snapshot after response
+    conv.htmlSnapshot = wrap.innerHTML;
 
-  }catch(e){
-    bubble.innerHTML=`<span style="color:#c0392b;font-size:14px">⚠ Error: ${e.message}</span>`;
-    if(!thinkingText)thinkWrap.remove();
+  } catch (e) {
+    bubble.innerHTML = `<span style="color:#c0392b;font-size:14px">⚠ Error: ${e.message}</span>`;
+    if (!thinkingText) thinkWrap.remove();
   }
 
-  isStreaming=false;
-  document.getElementById('sendBtn').disabled=false;
+  isStreaming = false;
+  document.getElementById('sendBtn').disabled = false;
 }
 
-function toggleThink(header){
-  const body=header.parentElement.querySelector('.think-body');
-  const chev=header.querySelector('.think-chevron');
-  if(!body)return;
-  const open=body.classList.toggle('visible');
-  chev.classList.toggle('open',open);
+function toggleThink(header) {
+  const body = header.parentElement.querySelector('.think-body');
+  const chev = header.querySelector('.think-chevron');
+  if (!body) return;
+  const open = body.classList.toggle('visible');
+  chev.classList.toggle('open', open);
 }
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+newChat();
 </script>
 </body>
 </html>
