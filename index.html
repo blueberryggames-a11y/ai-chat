@@ -733,16 +733,52 @@ function loadImageFile(file) {
   reader.onload = ev => {
     const img = new Image();
     img.onload = () => {
+      // Max dimension: 1568px (Claude's optimal vision size), max base64 ~4.8MB
+      const MAX_DIM = 1568;
+      const MAX_B64 = 4.8 * 1024 * 1024; // bytes (base64 chars ≈ bytes here)
+
+      let { naturalWidth: w, naturalHeight: h } = img;
+      if (w > MAX_DIM || h > MAX_DIM) {
+        const scale = MAX_DIM / Math.max(w, h);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+      }
+
       const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+      canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      const dataUrl = canvas.toDataURL('image/png');
-      pendingImages.push({ dataUrl, base64: dataUrl.split(',')[1], mediaType: 'image/png', name: file.name });
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+
+      // Try JPEG at decreasing quality until under limit
+      let dataUrl, quality = 0.92;
+      do {
+        dataUrl = canvas.toDataURL('image/jpeg', quality);
+        quality -= 0.1;
+      } while (dataUrl.length > MAX_B64 && quality > 0.1);
+
+      // If still too big, shrink dimensions further
+      if (dataUrl.length > MAX_B64) {
+        const scale2 = Math.sqrt(MAX_B64 / dataUrl.length);
+        canvas.width  = Math.round(w * scale2);
+        canvas.height = Math.round(h * scale2);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      }
+
+      pendingImages.push({
+        dataUrl,
+        base64: dataUrl.split(',')[1],
+        mediaType: 'image/jpeg',
+        name: file.name
+      });
       renderPreviews();
     };
     img.onerror = () => {
+      // Fallback — shouldn't hit 5MB limit on corrupt files anyway
       const dataUrl = ev.target.result;
       pendingImages.push({ dataUrl, base64: dataUrl.split(',')[1], mediaType: file.type, name: file.name });
       renderPreviews();
