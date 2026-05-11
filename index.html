@@ -75,8 +75,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .chat-delete{display:none;align-items:center;justify-content:center;width:18px;height:18px;border-radius:5px;border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:13px;padding:0;flex-shrink:0}
 .chat-delete:hover{background:rgba(196,83,58,0.12);color:var(--accent)}
 .chat-item:hover .chat-delete{display:flex}
-
-/* USER INFO IN SIDEBAR BOTTOM */
 .sidebar-user{padding:10px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:9px;flex-shrink:0}
 .user-avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .user-info{flex:1;min-width:0}
@@ -87,8 +85,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 
 /* ── MAIN ─────────────────────────────────────────────────────────────────── */
 .main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden}
-
-/* TOP BAR */
 .topbar{display:flex;align-items:center;padding:11px 20px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:10px}
 .topbar-title{font-family:'Instrument Serif',serif;font-size:17px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .think-mode-group{display:flex;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:3px}
@@ -113,7 +109,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .msg-assistant{align-items:flex-start}
 .bubble{padding:13px 17px;border-radius:var(--r);line-height:1.65;font-size:15px;max-width:85%}
 .bubble-user{background:var(--user-bg);color:var(--user-text);border-bottom-right-radius:5px}
-.bubble-assistant{background:var(--surface);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:5px}
+.bubble-assistant{background:var(--surface);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:5px;min-width:48px;min-height:24px}
 .user-images{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;max-width:85%}
 .user-img-thumb{width:130px;height:100px;object-fit:cover;border-radius:10px;border:2px solid rgba(255,255,255,0.08)}
 
@@ -166,7 +162,7 @@ textarea::placeholder{color:var(--text3)}
 .credit-bar-fill.warn{background:#e0a020}
 .credit-bar-fill.low{background:#c0392b}
 
-/* ── PASTE ATTACHMENT ─────────────────────────────────────────────────────── */
+/* PASTE ATTACHMENT */
 .paste-attach{display:flex;align-items:center;gap:8px;padding:7px 11px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;font-size:12px;color:var(--text2);position:relative;max-width:220px;cursor:default}
 .paste-attach-icon{font-size:16px;flex-shrink:0;line-height:1}
 .paste-attach-info{flex:1;min-width:0}
@@ -174,8 +170,6 @@ textarea::placeholder{color:var(--text3)}
 .paste-attach-size{font-size:10px;color:var(--text3)}
 .paste-attach-remove{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--text2);color:#fff;border:none;cursor:pointer;font-size:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .paste-attach-remove:hover{background:var(--accent)}
-
-/* User bubble text attachment display */
 .user-text-attach{display:flex;align-items:center;gap:7px;padding:8px 12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:10px;font-size:12px;color:var(--user-text);max-width:260px;margin-bottom:6px}
 .user-text-attach-icon{font-size:15px;opacity:.7}
 .user-text-attach-info{flex:1;min-width:0}
@@ -196,6 +190,14 @@ textarea::placeholder{color:var(--text3)}
 .bubble-assistant .copy-btn svg{width:12px;height:12px}
 .bubble-assistant .code-block-wrap pre{margin:0;border-radius:0;border:none;background:var(--surface2)}
 .bubble-assistant .code-block-wrap pre code{background:none;padding:0}
+
+/* Streaming code block — shown before closing fence */
+.streaming-code-block{margin:10px 0;border-radius:10px;overflow:hidden;border:1px solid var(--border2)}
+.streaming-code-block .code-block-header{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.streaming-code-lang{font-size:11px;font-weight:500;color:var(--text2);text-transform:lowercase;font-family:monospace}
+.streaming-code-indicator{font-size:10px;color:var(--text3);font-family:'DM Sans',sans-serif;animation:pulse 1.2s ease-in-out infinite}
+.streaming-code-block pre{margin:0;background:var(--surface2);padding:13px;overflow-x:auto}
+.streaming-code-block pre code{font-family:monospace;font-size:12.5px;line-height:1.6;background:none;padding:0;color:var(--text)}
 
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -222,7 +224,7 @@ textarea::placeholder{color:var(--text3)}
 </head>
 <body>
 
-<!-- ── AUTH OVERLAY ───────────────────────────────────────────────────────── -->
+<!-- AUTH OVERLAY -->
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-card">
     <div class="auth-logo">
@@ -252,24 +254,22 @@ textarea::placeholder{color:var(--text3)}
       <input type="text" id="authName" placeholder="Your name">
     </div>
     <button class="auth-btn" id="authSubmitBtn" onclick="authSubmit()">Sign in</button>
-    <div class="auth-switch" id="authSwitch">
-      No account? <a onclick="toggleAuthMode()">Create one</a>
-    </div>
+    <div class="auth-switch" id="authSwitch">No account? <a onclick="toggleAuthMode()">Create one</a></div>
   </div>
 </div>
 
-<!-- ── OUT OF CREDITS OVERLAY ─────────────────────────────────────────────── -->
+<!-- OUT OF CREDITS OVERLAY -->
 <div class="credits-overlay" id="creditsOverlay">
   <div class="credits-card">
     <div class="credits-icon">✦</div>
     <div class="credits-title">Out of credits</div>
-    <div class="credits-body">You've used all your daily credits. Credits reset at midnight and you'll get a fresh 100 to use.</div>
+    <div class="credits-body">You've used all your daily credits. Credits reset at midnight and you'll get a fresh set to use tomorrow.</div>
     <div class="credits-reset" id="creditsResetTime">Resets in: calculating…</div>
     <button class="credits-ok" onclick="document.getElementById('creditsOverlay').classList.remove('show')">Got it</button>
   </div>
 </div>
 
-<!-- ── SIDEBAR ─────────────────────────────────────────────────────────────── -->
+<!-- SIDEBAR -->
 <div class="sidebar">
   <div class="sidebar-top">
     <div class="logo">
@@ -293,7 +293,7 @@ textarea::placeholder{color:var(--text3)}
   </div>
 </div>
 
-<!-- ── MAIN ───────────────────────────────────────────────────────────────── -->
+<!-- MAIN -->
 <div class="main">
   <div class="topbar">
     <span class="topbar-title" id="topbarTitle">New conversation</span>
@@ -312,18 +312,17 @@ textarea::placeholder{color:var(--text3)}
         <p>Ask anything, upload images, or dial up the thinking for deep problems.</p>
         <div class="empty-modes">
           <div class="empty-mode-chip"><span>Normal</span> — 1 credit</div>
-          <div class="empty-mode-chip"><span>Extended</span> — 3 credits</div>
-          <div class="empty-mode-chip"><span>Max</span> — 8 credits</div>
+          <div class="empty-mode-chip"><span>Extended</span> — 2 credits</div>
+          <div class="empty-mode-chip"><span>Max</span> — 5 credits</div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="input-wrap" id="inputWrap">
-    <!-- Credit bar -->
     <div class="credit-bar-wrap" id="creditBarWrap" style="display:none">
       <div class="credit-bar-row">
-        <span class="credit-bar-label"><b id="creditBarNum">45</b> / 45 credits remaining today</span>
+        <span class="credit-bar-label"><b id="creditBarNum">20</b> / 20 credits remaining today</span>
         <span class="credit-bar-label" id="creditCostHint" style="font-size:10px"></span>
       </div>
       <div class="credit-bar-bg">
@@ -348,11 +347,11 @@ textarea::placeholder{color:var(--text3)}
   </div>
 </div>
 
-<!-- ── FIREBASE ────────────────────────────────────────────────────────────── -->
+<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut as fbSignOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, deleteDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, getDocs, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCSoOx1eq8Rl7VyzWLsMSYgQeRdZPVG1kA",
@@ -370,8 +369,11 @@ const db       = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
 // ── CREDIT SYSTEM ──────────────────────────────────────────────────────────
-const DAILY_CREDITS  = 45;
-const CREDIT_COST    = { normal: 1, extended: 3, max: 8 };
+// Rebalanced: 20 credits/day. Normal=1, Extended=2, Max=5
+// This means: 20 normal messages, or 10 extended, or 4 max, or a mix
+// At ~$0.003/normal msg and $0.01/extended and $0.04/max, daily ceiling ~$0.20
+const DAILY_CREDITS = 20;
+const CREDIT_COST   = { normal: 1, extended: 2, max: 5 };
 let   currentCredits = DAILY_CREDITS;
 let   currentUser    = null;
 
@@ -406,27 +408,30 @@ function updateCreditUI() {
   const fill = document.getElementById('creditBarFill');
   const num  = document.getElementById('creditBarNum');
   const lbl  = document.getElementById('userCreditsLabel');
+  // Update the label total too
+  const barLabel = document.querySelector('.credit-bar-label b + * , .credit-bar-label');
   if (fill) {
     fill.style.width = pct + '%';
     fill.className   = 'credit-bar-fill' + (pct <= 15 ? ' low' : pct <= 40 ? ' warn' : '');
   }
-  if (num)  num.textContent  = currentCredits;
-  if (lbl)  lbl.textContent  = currentCredits + ' credits today';
+  if (num) num.textContent = currentCredits;
+  if (lbl) lbl.textContent = currentCredits + ' credits today';
+  // Update the "/N" total display
+  const barRow = document.querySelector('.credit-bar-label');
+  if (barRow) barRow.innerHTML = `<b id="creditBarNum">${currentCredits}</b> / ${DAILY_CREDITS} credits remaining today`;
 }
 
 function canAfford(mode) { return currentCredits >= CREDIT_COST[mode]; }
 
-// Reset countdown
 function updateResetCountdown() {
-  const now      = new Date();
-  const midnight = new Date(now); midnight.setHours(24,0,0,0);
-  const diff     = midnight - now;
-  const h = Math.floor(diff/3600000);
-  const m = Math.floor((diff%3600000)/60000);
+  const now = new Date(), midnight = new Date(now); midnight.setHours(24,0,0,0);
+  const diff = midnight - now;
+  const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000);
   const el = document.getElementById('creditsResetTime');
   if (el) el.textContent = `Resets in ${h}h ${m}m`;
 }
 setInterval(updateResetCountdown, 30000);
+window.updateResetCountdown = updateResetCountdown;
 
 // ── AUTH STATE ─────────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
@@ -446,14 +451,14 @@ onAuthStateChanged(auth, async user => {
   }
 });
 
-// ── AUTH FUNCTIONS (exposed to global) ────────────────────────────────────
+// ── AUTH FUNCTIONS ─────────────────────────────────────────────────────────
 let authMode = 'signin';
 
 window.toggleAuthMode = function() {
   authMode = authMode === 'signin' ? 'signup' : 'signin';
   const isSignup = authMode === 'signup';
   document.getElementById('authTitle').textContent     = isSignup ? 'Create account' : 'Welcome back';
-  document.getElementById('authSub').textContent       = isSignup ? 'Sign up for free — 100 credits every day.' : 'Sign in to your account to continue.';
+  document.getElementById('authSub').textContent       = isSignup ? 'Sign up for free — 20 credits every day.' : 'Sign in to your account to continue.';
   document.getElementById('authSubmitBtn').textContent = isSignup ? 'Create account' : 'Sign in';
   document.getElementById('authSwitch').innerHTML      = isSignup
     ? 'Already have an account? <a onclick="toggleAuthMode()">Sign in</a>'
@@ -465,11 +470,10 @@ window.toggleAuthMode = function() {
 window.authKey = function(e) { if (e.key === 'Enter') authSubmit(); };
 
 window.authSubmit = async function() {
-  const email    = document.getElementById('authEmail').value.trim();
+  const email = document.getElementById('authEmail').value.trim();
   const password = document.getElementById('authPassword').value;
-  const errEl    = document.getElementById('authErr');
-  const btn      = document.getElementById('authSubmitBtn');
-  errEl.classList.remove('show');
+  const btn = document.getElementById('authSubmitBtn');
+  document.getElementById('authErr').classList.remove('show');
   if (!email || !password) { showAuthErr('Please fill in all fields.'); return; }
   btn.disabled = true;
   try {
@@ -480,9 +484,7 @@ window.authSubmit = async function() {
     } else {
       await signInWithEmailAndPassword(auth, email, password);
     }
-  } catch(e) {
-    showAuthErr(friendlyAuthError(e.code));
-  }
+  } catch(e) { showAuthErr(friendlyAuthError(e.code)); }
   btn.disabled = false;
 };
 
@@ -504,88 +506,57 @@ function showAuthErr(msg) {
 
 function friendlyAuthError(code) {
   const map = {
-    'auth/invalid-email':            'Invalid email address.',
-    'auth/user-not-found':           'No account with that email.',
-    'auth/wrong-password':           'Incorrect password.',
-    'auth/email-already-in-use':     'Email already in use.',
-    'auth/weak-password':            'Password must be at least 6 characters.',
-    'auth/too-many-requests':        'Too many attempts. Try again later.',
-    'auth/invalid-credential':       'Incorrect email or password.',
-    'auth/popup-closed-by-user':     'Sign-in popup was closed.',
+    'auth/invalid-email':'Invalid email address.','auth/user-not-found':'No account with that email.',
+    'auth/wrong-password':'Incorrect password.','auth/email-already-in-use':'Email already in use.',
+    'auth/weak-password':'Password must be at least 6 characters.','auth/too-many-requests':'Too many attempts. Try again later.',
+    'auth/invalid-credential':'Incorrect email or password.','auth/popup-closed-by-user':'Sign-in popup was closed.',
   };
   return map[code] || 'Something went wrong. Please try again.';
 }
 
-// ── FIRESTORE CONVERSATIONS ────────────────────────────────────────────────
+// ── FIRESTORE ──────────────────────────────────────────────────────────────
 async function loadUserConversations(uid) {
   conversations = {};
   try {
-    const colRef = collection(db, 'users', uid, 'conversations');
-    const q      = query(colRef, orderBy('updatedAt', 'desc'));
-    const snap   = await getDocs(q);
+    const q    = query(collection(db, 'users', uid, 'conversations'), orderBy('updatedAt', 'desc'));
+    const snap = await getDocs(q);
     snap.forEach(d => {
       const data = d.data();
-      conversations[d.id] = {
-        title:       data.title || 'Untitled',
-        history:     data.history || [],
-        htmlSnapshot: data.htmlSnapshot || '',
-        firestoreId: d.id,
-      };
+      conversations[d.id] = { title: data.title || 'Untitled', history: data.history || [], htmlSnapshot: data.htmlSnapshot || '', firestoreId: d.id };
     });
   } catch(e) { console.warn('Could not load conversations:', e); }
 
-  if (Object.keys(conversations).length === 0) {
-    newChat();
-  } else {
-    activeChatId = Object.keys(conversations)[0];
-    renderSidebar();
-    renderChat();
-  }
+  if (Object.keys(conversations).length === 0) { newChat(); }
+  else { activeChatId = Object.keys(conversations)[0]; renderSidebar(); renderChat(); }
 }
 
 async function saveConversation(id) {
   if (!currentUser) return;
-  const conv = conversations[id];
-  if (!conv) return;
+  const conv = conversations[id]; if (!conv) return;
   try {
-    // Strip base64 image data from history before saving (too large for Firestore)
     const safeHistory = conv.history.map(msg => {
       if (Array.isArray(msg.content)) {
-        return {
-          ...msg,
-          content: msg.content.map(block =>
-            block.type === 'image'
-              ? { type: 'text', text: '[image]' }
-              : block
-          )
-        };
+        return { ...msg, content: msg.content.map(b => b.type==='image' ? {type:'text',text:'[image]'} : b) };
       }
       return msg;
     });
-
-    const ref  = doc(db, 'users', currentUser.uid, 'conversations', id);
-    await setDoc(ref, {
-      title:       conv.title,
-      history:     safeHistory,
-      htmlSnapshot: conv.htmlSnapshot || '',
-      updatedAt:   serverTimestamp(),
+    await setDoc(doc(db, 'users', currentUser.uid, 'conversations', id), {
+      title: conv.title, history: safeHistory, htmlSnapshot: conv.htmlSnapshot || '', updatedAt: serverTimestamp(),
     }, { merge: true });
   } catch(e) { console.warn('Save failed:', e); }
 }
 
 async function deleteConversationFromFirestore(id) {
   if (!currentUser) return;
-  try {
-    await deleteDoc(doc(db, 'users', currentUser.uid, 'conversations', id));
-  } catch(e) { console.warn('Delete failed:', e); }
+  try { await deleteDoc(doc(db, 'users', currentUser.uid, 'conversations', id)); } catch(e) { console.warn('Delete failed:', e); }
 }
 
-// ── EXPOSE TO GLOBAL SCOPE ─────────────────────────────────────────────────
 window._firebase = { spendCredits, canAfford, saveConversation, deleteConversationFromFirestore };
 window._creditCost = CREDIT_COST;
+window._dailyCredits = DAILY_CREDITS;
 </script>
 
-<!-- ── MAIN APP SCRIPT ────────────────────────────────────────────────────── -->
+<!-- MAIN APP -->
 <script>
 const PROXY_URL = 'https://green-paper-910b.xxgoldenwarriors.workers.dev/';
 
@@ -618,27 +589,30 @@ CAPABILITIES:
 - Code: write clean, well-commented, production-ready code by default
 - Math: work through problems carefully, showing steps
 - Analysis: go beyond surface-level — find the non-obvious angle
-- Vision: when images are provided, analyze them carefully and in detail
+- Vision: when images are provided, analyze them carefully and in detail`;
 
-You have extended thinking enabled. Use it genuinely as your scratchpad for hard problems.`;
-
+// ── THINK CONFIG ──────────────────────────────────────────────────────────
+// KEY FIX: Normal mode has NO thinking at all (thinking: disabled / omitted)
+// Extended: moderate budget, Extended Thinking beta
+// Max: large budget, Max Thinking beta
 const THINK_CONFIG = {
   normal:   { enabled: false, budget: 0,     max_tokens: 8192,  label: 'Thinking' },
-  extended: { enabled: true,  budget: 10000, max_tokens: 16000, label: 'Extended reasoning' },
-  max:      { enabled: true,  budget: 32000, max_tokens: 32000, label: 'Max thinking' },
+  extended: { enabled: true,  budget: 8000,  max_tokens: 14000, label: 'Extended reasoning' },
+  max:      { enabled: true,  budget: 25000, max_tokens: 30000, label: 'Deep thinking' },
 };
 let thinkMode = 'normal';
 
 function setThinkMode(mode) {
   thinkMode = mode;
   ['Normal','Extended','Max'].forEach(m => document.getElementById('mode'+m)?.classList.remove('active'));
-  document.getElementById('mode' + mode.charAt(0).toUpperCase() + mode.slice(1))?.classList.add('active');
+  const btnId = mode === 'max' ? 'modeMax' : mode === 'extended' ? 'modeExtended' : 'modeNormal';
+  document.getElementById(btnId)?.classList.add('active');
+  const cost = (window._creditCost || {normal:1,extended:2,max:5})[mode];
   const hint = document.getElementById('inputHint');
-  const cost = (window._creditCost || {normal:1,extended:3,max:8})[mode];
-  if (mode === 'max')           hint.textContent = `Max thinking — ~30s, costs ${cost} credits`;
-  else if (mode === 'extended') hint.textContent = `Extended thinking — ~10s, costs ${cost} credits`;
-  else                          hint.textContent = `Enter to send · costs ${cost} credit`;
   const costHint = document.getElementById('creditCostHint');
+  if (mode === 'max')           hint.textContent = `Max thinking enabled — costs ${cost} credits`;
+  else if (mode === 'extended') hint.textContent = `Extended thinking — costs ${cost} credits`;
+  else                          hint.textContent = `Enter to send · costs ${cost} credit`;
   if (costHint) costHint.textContent = `This mode: ${cost} credit${cost>1?'s':''}`;
 }
 
@@ -648,6 +622,8 @@ let activeChatId  = null;
 let isStreaming   = false;
 let msgCounter    = 0;
 let pendingImages = [];
+let pendingTextAttachments = [];
+const LARGE_TEXT_THRESHOLD = 300;
 
 function genId() { return 'c' + Date.now() + Math.random().toString(36).slice(2,6); }
 
@@ -703,53 +679,37 @@ function renderChat() {
       <p>Ask anything, upload images, or dial up the thinking for deep problems.</p>
       <div class="empty-modes">
         <div class="empty-mode-chip"><span>Normal</span> — 1 credit</div>
-        <div class="empty-mode-chip"><span>Extended</span> — 3 credits</div>
-        <div class="empty-mode-chip"><span>Max</span> — 8 credits</div>
+        <div class="empty-mode-chip"><span>Extended</span> — 2 credits</div>
+        <div class="empty-mode-chip"><span>Max</span> — 5 credits</div>
       </div>
     </div>`;
   scrollBottom();
 }
 
 // ── IMAGE HANDLING ─────────────────────────────────────────────────────────
-// Pending state: images and text attachments
-let pendingTextAttachments = []; // {name, content}
-const LARGE_TEXT_THRESHOLD = 300; // chars — paste as attachment above this
-
 function handleFileSelect(e) { Array.from(e.target.files).forEach(f => { if(f.type.startsWith('image/')) loadImageFile(f); }); e.target.value=''; }
 
 function loadImageFile(file) {
   if (!file || !file.type.startsWith('image/')) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    const dataUrl = ev.target.result;
-    // Normalize all images to JPEG via canvas to avoid format issues (some browsers
-    // report wrong MIME types, or the API rejects certain PNG sub-formats)
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
+      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
       const ctx = canvas.getContext('2d');
-      // Fill white background in case of transparency (JPEG doesn't support alpha)
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
-      // Use PNG to preserve quality and avoid JPEG artifacts — PNG is always safe
-      const normalizedDataUrl = canvas.toDataURL('image/png');
-      pendingImages.push({
-        dataUrl: normalizedDataUrl,
-        base64: normalizedDataUrl.split(',')[1],
-        mediaType: 'image/png',
-        name: file.name
-      });
+      const dataUrl = canvas.toDataURL('image/png');
+      pendingImages.push({ dataUrl, base64: dataUrl.split(',')[1], mediaType: 'image/png', name: file.name });
       renderPreviews();
     };
     img.onerror = () => {
-      // Fallback: use original data as-is
+      const dataUrl = ev.target.result;
       pendingImages.push({ dataUrl, base64: dataUrl.split(',')[1], mediaType: file.type, name: file.name });
       renderPreviews();
     };
-    img.src = dataUrl;
+    img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
 }
@@ -762,20 +722,17 @@ function addTextAttachment(text, name) {
 function renderPreviews() {
   const strip = document.getElementById('imgPreviewStrip');
   let html = '';
-  // Text attachments
   pendingTextAttachments.forEach((att, i) => {
     const lines = att.content.split('\n').length;
-    const chars = att.content.length;
     html += `<div class="paste-attach">
       <span class="paste-attach-icon">📄</span>
       <div class="paste-attach-info">
         <div class="paste-attach-name">${escHtml(att.name)}</div>
-        <div class="paste-attach-size">${lines} lines · ${chars} chars</div>
+        <div class="paste-attach-size">${lines} lines · ${att.content.length} chars</div>
       </div>
       <button class="paste-attach-remove" onclick="removeTextAttach(${i})">✕</button>
     </div>`;
   });
-  // Image attachments
   pendingImages.forEach((img, i) => {
     html += `<div class="img-thumb"><img src="${img.dataUrl}" alt=""><button class="img-thumb-remove" onclick="removeImage(${i})">✕</button></div>`;
   });
@@ -802,18 +759,12 @@ inputWrap.addEventListener('drop', e => {
 
 document.addEventListener('paste', e => {
   const items = Array.from(e.clipboardData?.items || []);
-  // Check for image items first
   const imgItem = items.find(it => it.type.startsWith('image/'));
   if (imgItem) { const f = imgItem.getAsFile(); if(f) loadImageFile(f); return; }
-  // Check for large text paste — attach instead of dumping into textarea
   const textItem = items.find(it => it.type === 'text/plain');
   if (textItem) {
     textItem.getAsString(str => {
-      if (str.length >= LARGE_TEXT_THRESHOLD) {
-        e.preventDefault();
-        addTextAttachment(str, 'pasted-text.txt');
-      }
-      // Short text: let it paste normally into textarea
+      if (str.length >= LARGE_TEXT_THRESHOLD) { e.preventDefault(); addTextAttachment(str, 'pasted-text.txt'); }
     });
   }
 });
@@ -828,118 +779,157 @@ function scrollBottom() { const w=document.getElementById('chatWrap'); w.scrollT
 window.copyCode = function(id) {
   const el = document.getElementById(id);
   if (!el) return;
-  // Get the raw text content (not innerHTML) so we get the unescaped code
-  const text = el.textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    // Find the button that triggered this copy and show feedback
+  navigator.clipboard.writeText(el.textContent).then(() => {
     const btn = el.closest('.code-block-wrap')?.querySelector('.copy-btn');
     if (btn) {
       btn.classList.add('copied');
       btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Copied!`;
       setTimeout(() => {
         btn.classList.remove('copied');
-        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy`;
+        btn.innerHTML = copyIcon();
       }, 2000);
     }
   }).catch(() => {
-    // Fallback for older browsers
     const range = document.createRange();
     range.selectNodeContents(el);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-    document.execCommand('copy');
-    sel.removeAllRanges();
+    const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+    document.execCommand('copy'); sel.removeAllRanges();
   });
 };
 
-// ── MARKDOWN RENDERER ──────────────────────────────────────────────────────
-// Tracks code block IDs to ensure uniqueness per render call
+function copyIcon() {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy`;
+}
+
+// ── STREAMING MARKDOWN RENDERER ──────────────────────────────────────────
+// This renderer handles in-progress (streaming) text, showing code blocks
+// progressively even before the closing ``` fence arrives.
+
 let _codeBlockIdx = 0;
 
-function md(text) {
-  let codeIdx = 0;
-  const blockId = ++_codeBlockIdx;
+function mdStream(text) {
+  // Split text into segments: completed code blocks, open code block, and prose
+  const segments = [];
+  let remaining = text;
+  const fenceRe = /```(\w*)\n?([\s\S]*?)```/g;
+  let lastIndex = 0;
+  let match;
 
-  // 1. Fenced code blocks — MUST escape HTML inside the code, then wrap with copy button
-  //    Use a placeholder approach to protect already-processed blocks from further regex
-  const codeBlocks = [];
-  let h = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
-    const escaped = escHtml(code.trimEnd());
-    const id = `code_${blockId}_${++codeIdx}`;
-    const langLabel = lang ? `<span class="code-lang">${escHtml(lang)}</span>` : '<span class="code-lang"></span>';
-    const copyIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
-    const html = `<div class="code-block-wrap"><div class="code-block-header">${langLabel}<button class="copy-btn" onclick="copyCode('${id}')">${copyIcon}Copy</button></div><pre><code id="${id}">${escaped}</code></pre></div>`;
-    const placeholder = `\x00CODEBLOCK${codeBlocks.length}\x00`;
-    codeBlocks.push(html);
-    return placeholder;
-  });
+  // Find all COMPLETED code blocks
+  while ((match = fenceRe.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      segments.push({ type: 'prose', text: text.slice(lastIndex, match.index) });
+    }
+    segments.push({ type: 'code', lang: match[1], code: match[2].trimEnd() });
+    lastIndex = fenceRe.lastIndex;
+  }
 
-  // 2. Inline code — escape HTML inside backticks
+  // Check if there's an open (incomplete) code block after the last completed one
+  const afterLast = text.slice(lastIndex);
+  const openFence = afterLast.match(/^```(\w*)\n?([\s\S]*)$/m);
+  if (openFence) {
+    // There's prose before the open fence
+    const beforeFence = afterLast.slice(0, afterLast.indexOf('```'));
+    if (beforeFence) segments.push({ type: 'prose', text: beforeFence });
+    segments.push({ type: 'code-open', lang: openFence[1], code: openFence[2] });
+  } else {
+    if (afterLast) segments.push({ type: 'prose', text: afterLast });
+  }
+
+  let html = '';
+  let blockIdx = ++_codeBlockIdx;
+  let codeCount = 0;
+
+  for (const seg of segments) {
+    if (seg.type === 'prose') {
+      html += mdProse(seg.text);
+    } else if (seg.type === 'code') {
+      const id = `code_${blockIdx}_${++codeCount}`;
+      const escaped = escHtml(seg.code);
+      const langLabel = seg.lang ? `<span class="code-lang">${escHtml(seg.lang)}</span>` : '<span class="code-lang">code</span>';
+      html += `<div class="code-block-wrap">
+        <div class="code-block-header">${langLabel}<button class="copy-btn" onclick="copyCode('${id}')">${copyIcon()}</button></div>
+        <pre><code id="${id}">${escaped}</code></pre>
+      </div>`;
+    } else if (seg.type === 'code-open') {
+      // Streaming: show the partial code in a live block
+      const escaped = escHtml(seg.code);
+      const langLabel = seg.lang ? escHtml(seg.lang) : 'code';
+      html += `<div class="streaming-code-block">
+        <div class="code-block-header">
+          <span class="streaming-code-lang">${langLabel}</span>
+          <span class="streaming-code-indicator">writing…</span>
+        </div>
+        <pre><code>${escaped}<span class="cursor"></span></code></pre>
+      </div>`;
+    }
+  }
+
+  return html;
+}
+
+// Prose-only markdown (no code block handling)
+function mdProse(text) {
+  if (!text.trim()) return '';
+  let h = text;
+  // Inline code
   h = h.replace(/`([^`\n]+)`/g, (_, code) => `<code>${escHtml(code)}</code>`);
-
-  // 3. Standard markdown transformations
-  h = h
-    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
-    .replace(/^## (.+)$/gm,'<h2>$1</h2>')
-    .replace(/^# (.+)$/gm,'<h1>$1</h1>')
-    .replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g,'<em>$1</em>')
-    .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
-    .replace(/^---$/gm,'<hr>')
-    .replace(/^[\*\-] (.+)$/gm,'<li>$1</li>')
-    .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
-    .replace(/\n\n/g,'</p><p>')
-    .replace(/\n/g,'<br>');
-
-  // 4. Wrap list items
+  // Headings
+  h = h.replace(/^### (.+)$/gm,'<h3>$1</h3>')
+       .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+       .replace(/^# (.+)$/gm,'<h1>$1</h1>');
+  // Bold/italic
+  h = h.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>')
+       .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+       .replace(/\*(.+?)\*/g,'<em>$1</em>');
+  // Blockquote / hr
+  h = h.replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>');
+  h = h.replace(/^---$/gm,'<hr>');
+  // Lists
+  h = h.replace(/^[\*\-] (.+)$/gm,'<li>$1</li>');
+  h = h.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
+  // Paragraphs
+  h = h.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
+  // Wrap list items
   h = h.replace(/((<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>');
-
-  // 5. Wrap in paragraph if not a block element
-  if (!h.match(/^<(h[1-3]|ul|ol|pre|blockquote|hr|\x00)/)) h = '<p>' + h + '</p>';
-
-  // 6. Restore code block placeholders
-  h = h.replace(/\x00CODEBLOCK(\d+)\x00/g, (_, i) => codeBlocks[parseInt(i)]);
-
+  // Wrap in paragraph if needed
+  if (!h.match(/^<(h[1-3]|ul|ol|pre|blockquote|hr|div)/)) h = '<p>' + h + '</p>';
   return h;
 }
 
-// ── STOP / SEND TOGGLE ────────────────────────────────────────────────────
+// Final render (same as mdStream but no cursor on open block)
+function mdFinal(text) {
+  return mdStream(text).replace(/<span class="cursor"><\/span>/g,'');
+}
+
+// ── STOP / SEND ──────────────────────────────────────────────────────────
 let abortController = null;
 
 function setStreamingUI(streaming) {
-  const btn   = document.getElementById('sendBtn');
-  const icon  = document.getElementById('sendIcon');
+  const btn = document.getElementById('sendBtn');
+  const icon = document.getElementById('sendIcon');
   const label = document.getElementById('sendLabel');
   if (streaming) {
-    btn.classList.add('stop-mode');
-    btn.disabled = false;
+    btn.classList.add('stop-mode'); btn.disabled = false;
     icon.innerHTML = '<rect x="4" y="4" width="16" height="16" rx="2" fill="currentColor" stroke="none"/>';
     label.textContent = 'Stop';
   } else {
-    btn.classList.remove('stop-mode');
-    btn.disabled = false;
+    btn.classList.remove('stop-mode'); btn.disabled = false;
     icon.innerHTML = '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>';
     label.textContent = 'Send';
   }
 }
 
 function handleSendStop() {
-  if (isStreaming) {
-    // Abort the stream
-    abortController?.abort();
-  } else {
-    sendMessage();
-  }
+  if (isStreaming) { abortController?.abort(); }
+  else { sendMessage(); }
 }
 
 // ── SEND ──────────────────────────────────────────────────────────────────
 async function sendMessage() {
   if (isStreaming) return;
 
-  // Check credits first
-  const cost = (window._creditCost || {normal:1,extended:3,max:8})[thinkMode];
+  const cost = (window._creditCost || {normal:1,extended:2,max:5})[thinkMode];
   if (window._firebase && !window._firebase.canAfford(thinkMode)) {
     updateResetCountdown();
     document.getElementById('creditsOverlay').classList.add('show');
@@ -967,7 +957,6 @@ async function sendMessage() {
   const uDiv = document.createElement('div');
   uDiv.className = 'msg msg-user';
   let uHtml = '';
-  // Show text attachments as cards in the user bubble
   textAttachments.forEach(att => {
     const lines = att.content.split('\n').length;
     uHtml += `<div class="user-text-attach">
@@ -987,10 +976,7 @@ async function sendMessage() {
   // Build API content
   const userContent = [];
   imgs.forEach(img => userContent.push({ type:'image', source:{ type:'base64', media_type:img.mediaType, data:img.base64 } }));
-  // Include text attachments as text blocks with labels
-  textAttachments.forEach(att => {
-    userContent.push({ type:'text', text: `[Attached file: ${att.name}]\n\`\`\`\n${att.content}\n\`\`\`` });
-  });
+  textAttachments.forEach(att => userContent.push({ type:'text', text:`[Attached file: ${att.name}]\n\`\`\`\n${att.content}\n\`\`\`` }));
   if (text) userContent.push({ type:'text', text });
   conv.history.push({ role:'user', content: userContent });
 
@@ -1001,7 +987,6 @@ async function sendMessage() {
     renderSidebar();
   }
 
-  // Spend credits before API call
   await window._firebase?.spendCredits(cost);
 
   // Assistant container
@@ -1010,18 +995,22 @@ async function sendMessage() {
   msgDiv.className = 'msg msg-assistant';
   wrap.appendChild(msgDiv);
 
-  const thinkWrap = document.createElement('div');
-  thinkWrap.className = 'think-wrap';
-  thinkWrap.style.display = 'none';
-  const badge = thinkMode==='max' ? '<span class="think-badge">MAX</span>' : '';
-  thinkWrap.innerHTML = `
-    <div class="think-header" onclick="toggleThink(this)">
-      <span class="think-dot pulsing"></span>
-      <span class="think-label">Thinking…</span>${badge}
-      <span class="think-chevron open">▾</span>
-    </div>
-    <div class="think-body visible" id="thinkBody-${msgId}"></div>`;
-  msgDiv.appendChild(thinkWrap);
+  // Thinking block (only shown for extended/max modes)
+  let thinkWrap = null;
+  if (cfg.enabled) {
+    thinkWrap = document.createElement('div');
+    thinkWrap.className = 'think-wrap';
+    thinkWrap.style.display = 'none';
+    const badge = thinkMode==='max' ? '<span class="think-badge">MAX</span>' : '';
+    thinkWrap.innerHTML = `
+      <div class="think-header" onclick="toggleThink(this)">
+        <span class="think-dot pulsing"></span>
+        <span class="think-label">Thinking…</span>${badge}
+        <span class="think-chevron open">▾</span>
+      </div>
+      <div class="think-body visible" id="thinkBody-${msgId}"></div>`;
+    msgDiv.appendChild(thinkWrap);
+  }
 
   const bubble = document.createElement('div');
   bubble.className = 'bubble bubble-assistant';
@@ -1029,106 +1018,137 @@ async function sendMessage() {
   msgDiv.appendChild(bubble);
   scrollBottom();
 
-  let thinkingText='', responseText='', inThinking=false, inText=false;
-  let stopped = false;
+  let thinkingText = '', responseText = '';
+  // Track which block type we're currently streaming into
+  // FIX: we track the current block type strictly from SSE events
+  let currentBlockType = null; // 'thinking' | 'text' | null
 
   try {
     const reqBody = {
-      model:'claude-sonnet-4-6', max_tokens:cfg.max_tokens,
-      system:SYSTEM, messages:conv.history, stream:true,
+      model: 'claude-sonnet-4-6',
+      max_tokens: cfg.max_tokens,
+      system: SYSTEM,
+      messages: conv.history,
+      stream: true,
     };
-    if (cfg.enabled) reqBody.thinking = { type:'enabled', budget_tokens:cfg.budget };
 
-    const headers = { 'Content-Type':'application/json', 'anthropic-version':'2023-06-01' };
+    // KEY FIX: Only send thinking config for extended/max modes
+    // Normal mode: no thinking parameter at all → model won't think
+    if (cfg.enabled) {
+      reqBody.thinking = { type: 'enabled', budget_tokens: cfg.budget };
+    }
+
+    const headers = { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' };
+    // Only send the beta header when thinking is enabled
     if (cfg.enabled) headers['anthropic-beta'] = 'interleaved-thinking-2025-05-14';
 
     abortController = new AbortController();
-    const res = await fetch(PROXY_URL, { method:'POST', headers, body:JSON.stringify(reqBody), signal: abortController.signal });
+    const res = await fetch(PROXY_URL, {
+      method: 'POST', headers, body: JSON.stringify(reqBody), signal: abortController.signal
+    });
+
     if (!res.ok) {
-      let msg=`HTTP ${res.status}`;
-      try{ const e=await res.json(); msg=e.error?.message||msg; }catch{}
+      let msg = `HTTP ${res.status}`;
+      try { const e = await res.json(); msg = e.error?.message || msg; } catch {}
       throw new Error(msg);
     }
 
-    const reader=res.body.getReader(), dec=new TextDecoder();
-    let buf='';
-    while(true){
-      const{done,value}=await reader.read(); if(done)break;
-      buf+=dec.decode(value,{stream:true});
-      const lines=buf.split('\n'); buf=lines.pop();
-      for(const line of lines){
-        if(!line.startsWith('data:'))continue;
-        const raw=line.slice(5).trim(); if(raw==='[DONE]')continue;
-        let evt; try{evt=JSON.parse(raw);}catch{continue;}
+    const reader = res.body.getReader(), dec = new TextDecoder();
+    let buf = '';
 
-        if(evt.type==='content_block_start'){
-          if(evt.content_block?.type==='thinking'){ inThinking=true; inText=false; thinkWrap.style.display='block'; }
-          else if(evt.content_block?.type==='text'){
-            inThinking=false; inText=true;
-            thinkWrap.querySelector('.think-dot')?.classList.remove('pulsing');
-            const lbl=thinkWrap.querySelector('.think-label'); if(lbl)lbl.textContent=cfg.label;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n'); buf = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data:')) continue;
+        const raw = line.slice(5).trim();
+        if (raw === '[DONE]') continue;
+        let evt;
+        try { evt = JSON.parse(raw); } catch { continue; }
+
+        // content_block_start: set which type we're in
+        if (evt.type === 'content_block_start') {
+          const blockType = evt.content_block?.type;
+          currentBlockType = blockType;
+
+          if (blockType === 'thinking' && thinkWrap) {
+            thinkWrap.style.display = 'block';
+          } else if (blockType === 'text') {
+            // Mark thinking as done
+            if (thinkWrap) {
+              thinkWrap.querySelector('.think-dot')?.classList.remove('pulsing');
+              const lbl = thinkWrap.querySelector('.think-label');
+              if (lbl) lbl.textContent = cfg.label;
+            }
           }
         }
-        if(evt.type==='content_block_delta'){
-          if(evt.delta?.type==='thinking_delta'&&inThinking){
-            thinkingText+=evt.delta.thinking||'';
-            const tb=document.getElementById(`thinkBody-${msgId}`); if(tb)tb.textContent=thinkingText;
+
+        // content_block_delta: append to the CORRECT block only
+        if (evt.type === 'content_block_delta') {
+          if (evt.delta?.type === 'thinking_delta' && currentBlockType === 'thinking') {
+            // FIX: thinking content goes ONLY to the thinking block
+            thinkingText += evt.delta.thinking || '';
+            const tb = document.getElementById(`thinkBody-${msgId}`);
+            if (tb) tb.textContent = thinkingText;
             scrollBottom();
           }
-          if(evt.delta?.type==='text_delta'&&inText){
-            responseText+=evt.delta.text||'';
-            bubble.innerHTML=md(responseText)+'<span class="cursor"></span>';
+
+          if (evt.delta?.type === 'text_delta' && currentBlockType === 'text') {
+            // FIX: text content goes ONLY to the response bubble
+            responseText += evt.delta.text || '';
+            // Use streaming renderer that shows code blocks as they form
+            bubble.innerHTML = mdStream(responseText);
             scrollBottom();
           }
+        }
+
+        // content_block_stop: clear current block type
+        if (evt.type === 'content_block_stop') {
+          currentBlockType = null;
         }
       }
     }
 
-    bubble.innerHTML=md(responseText);
-    if(!thinkingText)thinkWrap.remove();
-    conv.history.push({ role:'assistant', content:responseText });
+    // Final render with no cursor/streaming indicators
+    bubble.innerHTML = mdFinal(responseText);
+    if (!thinkingText && thinkWrap) thinkWrap.remove();
+    conv.history.push({ role:'assistant', content: responseText });
     conv.htmlSnapshot = wrap.innerHTML;
     await window._firebase?.saveConversation(activeChatId);
 
   } catch(e) {
     if (e.name === 'AbortError') {
-      // User stopped the response — render what we have so far
-      stopped = true;
       if (responseText) {
-        bubble.innerHTML = md(responseText) + '<span style="display:inline-block;font-size:11px;color:var(--text3);margin-left:6px;vertical-align:middle">· stopped</span>';
+        bubble.innerHTML = mdFinal(responseText) + '<span style="display:inline-block;font-size:11px;color:var(--text3);margin-left:6px;vertical-align:middle">· stopped</span>';
       } else {
         bubble.innerHTML = '<span style="color:var(--text3);font-size:14px">Stopped.</span>';
       }
-      if (!thinkingText) thinkWrap.remove();
+      if (!thinkingText && thinkWrap) thinkWrap.remove();
       if (responseText) {
         conv.history.push({ role:'assistant', content: responseText });
         conv.htmlSnapshot = wrap.innerHTML;
         await window._firebase?.saveConversation(activeChatId);
       }
     } else {
-      bubble.innerHTML=`<span style="color:#c0392b;font-size:14px">⚠ Error: ${e.message}</span>`;
-      if(!thinkingText)thinkWrap.remove();
+      bubble.innerHTML = `<span style="color:#c0392b;font-size:14px">⚠ Error: ${e.message}</span>`;
+      if (!thinkingText && thinkWrap) thinkWrap.remove();
     }
   }
 
   abortController = null;
-  isStreaming=false;
+  isStreaming = false;
   setStreamingUI(false);
 }
 
-function toggleThink(header){
-  const body=header.parentElement.querySelector('.think-body');
-  const chev=header.querySelector('.think-chevron');
-  if(!body)return;
-  const open=body.classList.toggle('visible');
-  chev.classList.toggle('open',open);
-}
-
-function updateResetCountdown(){
-  const now=new Date(), midnight=new Date(now); midnight.setHours(24,0,0,0);
-  const diff=midnight-now, h=Math.floor(diff/3600000), m=Math.floor((diff%3600000)/60000);
-  const el=document.getElementById('creditsResetTime');
-  if(el)el.textContent=`Resets in ${h}h ${m}m`;
+function toggleThink(header) {
+  const body = header.parentElement.querySelector('.think-body');
+  const chev = header.querySelector('.think-chevron');
+  if (!body) return;
+  const open = body.classList.toggle('visible');
+  chev.classList.toggle('open', open);
 }
 </script>
 </body>
