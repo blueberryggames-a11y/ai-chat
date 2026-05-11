@@ -83,11 +83,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .signout-btn{font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;flex-shrink:0}
 .signout-btn:hover{background:var(--surface2);color:var(--text)}
 
+/* ── MOBILE SIDEBAR TOGGLE ───────────────────────────────────────────────── */
+.sidebar-toggle{display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;flex-shrink:0}
+.sidebar-toggle:hover{background:var(--surface2);color:var(--text)}
+.sidebar-toggle svg{width:18px;height:18px}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(28,26,22,0.4);z-index:199;backdrop-filter:blur(2px)}
+.sidebar-overlay.show{display:block}
+
 /* ── MAIN ─────────────────────────────────────────────────────────────────── */
-.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;min-width:0}
 .topbar{display:flex;align-items:center;padding:11px 20px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;gap:10px}
-.topbar-title{font-family:'Instrument Serif',serif;font-size:17px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.think-mode-group{display:flex;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:3px}
+.topbar-title{font-family:'Instrument Serif',serif;font-size:17px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.think-mode-group{display:flex;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:3px;flex-shrink:0}
 .think-mode-btn{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;padding:4px 11px;border-radius:100px;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
 .think-mode-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
 .think-mode-btn.active.max-btn{background:var(--accent);color:#fff}
@@ -191,7 +198,7 @@ textarea::placeholder{color:var(--text3)}
 .bubble-assistant .code-block-wrap pre{margin:0;border-radius:0;border:none;background:var(--surface2)}
 .bubble-assistant .code-block-wrap pre code{background:none;padding:0}
 
-/* Streaming code block — shown before closing fence */
+/* Streaming code block */
 .streaming-code-block{margin:10px 0;border-radius:10px;overflow:hidden;border:1px solid var(--border2)}
 .streaming-code-block .code-block-header{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--surface2);border-bottom:1px solid var(--border)}
 .streaming-code-lang{font-size:11px;font-weight:500;color:var(--text2);text-transform:lowercase;font-family:monospace}
@@ -220,6 +227,34 @@ textarea::placeholder{color:var(--text3)}
 .bubble-assistant th,.bubble-assistant td{border:1px solid var(--border2);padding:6px 11px;text-align:left}
 .bubble-assistant th{background:var(--surface2);font-weight:500}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+
+/* ── MOBILE / TABLET ──────────────────────────────────────────────────────── */
+@media (max-width:900px){
+  .sidebar{
+    position:fixed;left:0;top:0;bottom:0;z-index:200;
+    transform:translateX(-100%);transition:transform .25s ease;
+    width:260px;
+  }
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-toggle{display:flex}
+  .topbar{padding:10px 14px;gap:8px}
+  .topbar-title{font-size:15px}
+  .think-mode-btn{font-size:10px;padding:4px 8px}
+  .chat-inner{padding:0 14px}
+  .chat-wrap{padding:20px 0 12px}
+  .input-wrap{padding:8px 12px 16px}
+  .input-box{border-radius:14px}
+  .bubble{font-size:14px;padding:11px 14px;max-width:92%}
+  .user-img-thumb{width:100px;height:78px}
+}
+
+@media (max-width:480px){
+  .think-mode-group{gap:2px;padding:2px}
+  .think-mode-btn{font-size:10px;padding:4px 7px}
+  .send-btn{padding:7px 12px;font-size:12px}
+  .topbar-title{font-size:14px}
+  .auth-card{padding:28px 20px;margin:16px}
+}
 </style>
 </head>
 <body>
@@ -269,8 +304,11 @@ textarea::placeholder{color:var(--text3)}
   </div>
 </div>
 
+<!-- SIDEBAR OVERLAY (mobile tap-to-close) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <!-- SIDEBAR -->
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
   <div class="sidebar-top">
     <div class="logo">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/></svg>
@@ -296,11 +334,15 @@ textarea::placeholder{color:var(--text3)}
 <!-- MAIN -->
 <div class="main">
   <div class="topbar">
+    <!-- hamburger toggle — only visible on mobile -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <span class="topbar-title" id="topbarTitle">New conversation</span>
     <div class="think-mode-group">
       <button class="think-mode-btn active" id="modeNormal"   onclick="setThinkMode('normal')">Normal</button>
       <button class="think-mode-btn"        id="modeExtended" onclick="setThinkMode('extended')">Extended</button>
-      <button class="think-mode-btn max-btn" id="modeMax"     onclick="setThinkMode('max')">Max Thinking</button>
+      <button class="think-mode-btn max-btn" id="modeMax"     onclick="setThinkMode('max')">Max</button>
     </div>
   </div>
 
@@ -368,10 +410,6 @@ const auth     = getAuth(app);
 const db       = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-// ── CREDIT SYSTEM ──────────────────────────────────────────────────────────
-// Rebalanced: 20 credits/day. Normal=1, Extended=2, Max=5
-// This means: 20 normal messages, or 10 extended, or 4 max, or a mix
-// At ~$0.003/normal msg and $0.01/extended and $0.04/max, daily ceiling ~$0.20
 const DAILY_CREDITS = 20;
 const CREDIT_COST   = { normal: 1, extended: 2, max: 5 };
 let   currentCredits = DAILY_CREDITS;
@@ -406,17 +444,12 @@ async function spendCredits(cost) {
 function updateCreditUI() {
   const pct  = (currentCredits / DAILY_CREDITS) * 100;
   const fill = document.getElementById('creditBarFill');
-  const num  = document.getElementById('creditBarNum');
   const lbl  = document.getElementById('userCreditsLabel');
-  // Update the label total too
-  const barLabel = document.querySelector('.credit-bar-label b + * , .credit-bar-label');
   if (fill) {
     fill.style.width = pct + '%';
     fill.className   = 'credit-bar-fill' + (pct <= 15 ? ' low' : pct <= 40 ? ' warn' : '');
   }
-  if (num) num.textContent = currentCredits;
   if (lbl) lbl.textContent = currentCredits + ' credits today';
-  // Update the "/N" total display
   const barRow = document.querySelector('.credit-bar-label');
   if (barRow) barRow.innerHTML = `<b id="creditBarNum">${currentCredits}</b> / ${DAILY_CREDITS} credits remaining today`;
 }
@@ -433,7 +466,6 @@ function updateResetCountdown() {
 setInterval(updateResetCountdown, 30000);
 window.updateResetCountdown = updateResetCountdown;
 
-// ── AUTH STATE ─────────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
   currentUser = user;
   if (user) {
@@ -451,7 +483,6 @@ onAuthStateChanged(auth, async user => {
   }
 });
 
-// ── AUTH FUNCTIONS ─────────────────────────────────────────────────────────
 let authMode = 'signin';
 
 window.toggleAuthMode = function() {
@@ -514,7 +545,6 @@ function friendlyAuthError(code) {
   return map[code] || 'Something went wrong. Please try again.';
 }
 
-// ── FIRESTORE ──────────────────────────────────────────────────────────────
 async function loadUserConversations(uid) {
   conversations = {};
   try {
@@ -591,16 +621,24 @@ CAPABILITIES:
 - Analysis: go beyond surface-level — find the non-obvious angle
 - Vision: when images are provided, analyze them carefully and in detail`;
 
-// ── THINK CONFIG ──────────────────────────────────────────────────────────
-// KEY FIX: Normal mode has NO thinking at all (thinking: disabled / omitted)
-// Extended: moderate budget, Extended Thinking beta
-// Max: large budget, Max Thinking beta
 const THINK_CONFIG = {
   normal:   { enabled: false, budget: 0,     max_tokens: 8192,  label: 'Thinking' },
   extended: { enabled: true,  budget: 8000,  max_tokens: 14000, label: 'Extended reasoning' },
   max:      { enabled: true,  budget: 25000, max_tokens: 30000, label: 'Deep thinking' },
 };
 let thinkMode = 'normal';
+
+// ── SIDEBAR MOBILE TOGGLE ─────────────────────────────────────────────────
+window.toggleSidebar = function() {
+  const s = document.getElementById('sidebar');
+  const o = document.getElementById('sidebarOverlay');
+  const open = s.classList.toggle('open');
+  o.classList.toggle('show', open);
+};
+window.closeSidebar = function() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+};
 
 function setThinkMode(mode) {
   thinkMode = mode;
@@ -616,7 +654,6 @@ function setThinkMode(mode) {
   if (costHint) costHint.textContent = `This mode: ${cost} credit${cost>1?'s':''}`;
 }
 
-// ── CONVERSATION STATE ─────────────────────────────────────────────────────
 let conversations = {};
 let activeChatId  = null;
 let isStreaming   = false;
@@ -629,6 +666,7 @@ function genId() { return 'c' + Date.now() + Math.random().toString(36).slice(2,
 
 function newChat() {
   if (isStreaming) return;
+  closeSidebar();
   const id = genId();
   conversations[id] = { title: 'New conversation', history: [], htmlSnapshot: '', firestoreId: id };
   activeChatId = id;
@@ -638,6 +676,7 @@ function newChat() {
 
 function switchChat(id) {
   if (isStreaming || id === activeChatId) return;
+  closeSidebar();
   if (activeChatId) conversations[activeChatId].htmlSnapshot = document.getElementById('chatInner').innerHTML;
   activeChatId = id;
   renderSidebar();
@@ -686,7 +725,6 @@ function renderChat() {
   scrollBottom();
 }
 
-// ── IMAGE HANDLING ─────────────────────────────────────────────────────────
 function handleFileSelect(e) { Array.from(e.target.files).forEach(f => { if(f.type.startsWith('image/')) loadImageFile(f); }); e.target.value=''; }
 
 function loadImageFile(file) {
@@ -769,13 +807,11 @@ document.addEventListener('paste', e => {
   }
 });
 
-// ── HELPERS ────────────────────────────────────────────────────────────────
 function escHtml(t) { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,160)+'px'; }
 function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } }
 function scrollBottom() { const w=document.getElementById('chatWrap'); w.scrollTop=w.scrollHeight; }
 
-// ── COPY CODE ──────────────────────────────────────────────────────────────
 window.copyCode = function(id) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -801,34 +837,21 @@ function copyIcon() {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy`;
 }
 
-// ── STREAMING MARKDOWN RENDERER ──────────────────────────────────────────
-// This renderer handles in-progress (streaming) text, showing code blocks
-// progressively even before the closing ``` fence arrives.
-
 let _codeBlockIdx = 0;
 
 function mdStream(text) {
-  // Split text into segments: completed code blocks, open code block, and prose
   const segments = [];
-  let remaining = text;
   const fenceRe = /```(\w*)\n?([\s\S]*?)```/g;
   let lastIndex = 0;
   let match;
-
-  // Find all COMPLETED code blocks
   while ((match = fenceRe.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      segments.push({ type: 'prose', text: text.slice(lastIndex, match.index) });
-    }
+    if (match.index > lastIndex) segments.push({ type: 'prose', text: text.slice(lastIndex, match.index) });
     segments.push({ type: 'code', lang: match[1], code: match[2].trimEnd() });
     lastIndex = fenceRe.lastIndex;
   }
-
-  // Check if there's an open (incomplete) code block after the last completed one
   const afterLast = text.slice(lastIndex);
   const openFence = afterLast.match(/^```(\w*)\n?([\s\S]*)$/m);
   if (openFence) {
-    // There's prose before the open fence
     const beforeFence = afterLast.slice(0, afterLast.indexOf('```'));
     if (beforeFence) segments.push({ type: 'prose', text: beforeFence });
     segments.push({ type: 'code-open', lang: openFence[1], code: openFence[2] });
@@ -852,7 +875,6 @@ function mdStream(text) {
         <pre><code id="${id}">${escaped}</code></pre>
       </div>`;
     } else if (seg.type === 'code-open') {
-      // Streaming: show the partial code in a live block
       const escaped = escHtml(seg.code);
       const langLabel = seg.lang ? escHtml(seg.lang) : 'code';
       html += `<div class="streaming-code-block">
@@ -864,45 +886,33 @@ function mdStream(text) {
       </div>`;
     }
   }
-
   return html;
 }
 
-// Prose-only markdown (no code block handling)
 function mdProse(text) {
   if (!text.trim()) return '';
   let h = text;
-  // Inline code
   h = h.replace(/`([^`\n]+)`/g, (_, code) => `<code>${escHtml(code)}</code>`);
-  // Headings
   h = h.replace(/^### (.+)$/gm,'<h3>$1</h3>')
        .replace(/^## (.+)$/gm,'<h2>$1</h2>')
        .replace(/^# (.+)$/gm,'<h1>$1</h1>');
-  // Bold/italic
   h = h.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>')
        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
        .replace(/\*(.+?)\*/g,'<em>$1</em>');
-  // Blockquote / hr
   h = h.replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>');
   h = h.replace(/^---$/gm,'<hr>');
-  // Lists
   h = h.replace(/^[\*\-] (.+)$/gm,'<li>$1</li>');
   h = h.replace(/^\d+\. (.+)$/gm,'<li>$1</li>');
-  // Paragraphs
   h = h.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
-  // Wrap list items
   h = h.replace(/((<li>.*?<\/li>\s*)+)/g,'<ul>$1</ul>');
-  // Wrap in paragraph if needed
   if (!h.match(/^<(h[1-3]|ul|ol|pre|blockquote|hr|div)/)) h = '<p>' + h + '</p>';
   return h;
 }
 
-// Final render (same as mdStream but no cursor on open block)
 function mdFinal(text) {
   return mdStream(text).replace(/<span class="cursor"><\/span>/g,'');
 }
 
-// ── STOP / SEND ──────────────────────────────────────────────────────────
 let abortController = null;
 
 function setStreamingUI(streaming) {
@@ -925,7 +935,6 @@ function handleSendStop() {
   else { sendMessage(); }
 }
 
-// ── SEND ──────────────────────────────────────────────────────────────────
 async function sendMessage() {
   if (isStreaming) return;
 
@@ -953,7 +962,6 @@ async function sendMessage() {
   document.getElementById('emptyState')?.remove();
   const wrap = document.getElementById('chatInner');
 
-  // User bubble
   const uDiv = document.createElement('div');
   uDiv.className = 'msg msg-user';
   let uHtml = '';
@@ -973,7 +981,6 @@ async function sendMessage() {
   wrap.appendChild(uDiv);
   scrollBottom();
 
-  // Build API content
   const userContent = [];
   imgs.forEach(img => userContent.push({ type:'image', source:{ type:'base64', media_type:img.mediaType, data:img.base64 } }));
   textAttachments.forEach(att => userContent.push({ type:'text', text:`[Attached file: ${att.name}]\n\`\`\`\n${att.content}\n\`\`\`` }));
@@ -989,13 +996,11 @@ async function sendMessage() {
 
   await window._firebase?.spendCredits(cost);
 
-  // Assistant container
   const msgId = ++msgCounter;
   const msgDiv = document.createElement('div');
   msgDiv.className = 'msg msg-assistant';
   wrap.appendChild(msgDiv);
 
-  // Thinking block (only shown for extended/max modes)
   let thinkWrap = null;
   if (cfg.enabled) {
     thinkWrap = document.createElement('div');
@@ -1019,9 +1024,7 @@ async function sendMessage() {
   scrollBottom();
 
   let thinkingText = '', responseText = '';
-  // Track which block type we're currently streaming into
-  // FIX: we track the current block type strictly from SSE events
-  let currentBlockType = null; // 'thinking' | 'text' | null
+  let currentBlockType = null;
 
   try {
     const reqBody = {
@@ -1032,14 +1035,11 @@ async function sendMessage() {
       stream: true,
     };
 
-    // KEY FIX: Only send thinking config for extended/max modes
-    // Normal mode: no thinking parameter at all → model won't think
     if (cfg.enabled) {
       reqBody.thinking = { type: 'enabled', budget_tokens: cfg.budget };
     }
 
     const headers = { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01' };
-    // Only send the beta header when thinking is enabled
     if (cfg.enabled) headers['anthropic-beta'] = 'interleaved-thinking-2025-05-14';
 
     abortController = new AbortController();
@@ -1069,15 +1069,12 @@ async function sendMessage() {
         let evt;
         try { evt = JSON.parse(raw); } catch { continue; }
 
-        // content_block_start: set which type we're in
         if (evt.type === 'content_block_start') {
           const blockType = evt.content_block?.type;
           currentBlockType = blockType;
-
           if (blockType === 'thinking' && thinkWrap) {
             thinkWrap.style.display = 'block';
           } else if (blockType === 'text') {
-            // Mark thinking as done
             if (thinkWrap) {
               thinkWrap.querySelector('.think-dot')?.classList.remove('pulsing');
               const lbl = thinkWrap.querySelector('.think-label');
@@ -1086,33 +1083,26 @@ async function sendMessage() {
           }
         }
 
-        // content_block_delta: append to the CORRECT block only
         if (evt.type === 'content_block_delta') {
           if (evt.delta?.type === 'thinking_delta' && currentBlockType === 'thinking') {
-            // FIX: thinking content goes ONLY to the thinking block
             thinkingText += evt.delta.thinking || '';
             const tb = document.getElementById(`thinkBody-${msgId}`);
             if (tb) tb.textContent = thinkingText;
             scrollBottom();
           }
-
           if (evt.delta?.type === 'text_delta' && currentBlockType === 'text') {
-            // FIX: text content goes ONLY to the response bubble
             responseText += evt.delta.text || '';
-            // Use streaming renderer that shows code blocks as they form
             bubble.innerHTML = mdStream(responseText);
             scrollBottom();
           }
         }
 
-        // content_block_stop: clear current block type
         if (evt.type === 'content_block_stop') {
           currentBlockType = null;
         }
       }
     }
 
-    // Final render with no cursor/streaming indicators
     bubble.innerHTML = mdFinal(responseText);
     if (!thinkingText && thinkWrap) thinkWrap.remove();
     conv.history.push({ role:'assistant', content: responseText });
